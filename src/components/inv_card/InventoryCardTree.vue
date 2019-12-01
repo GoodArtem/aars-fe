@@ -1,35 +1,35 @@
 <template>
-      <v-treeview
-        v-model="tree"
-        :active.sync="active"
-        :items="items"
-        :load-children="fetchItems"
-        :open.sync="open"
-        return-object
-        activatable
-        color="info"
-        transition
-        >
-        <template v-slot:prepend="{ item }">
-          <v-icon v-if="item.isInventoryCard && item.state === 0">mdi-card-bulleted-outline</v-icon>
-          <v-icon v-if="item.isInventoryCard && item.state === 1">mdi-card-bulleted-off-outline</v-icon>
-          <v-icon v-else-if="item.isDirectory">mdi-folder-open-outline</v-icon>
-          <v-icon v-else-if="item.isTheme">mdi-format-list-checks</v-icon>
-          <v-icon v-else-if="item.isRootObject">mdi-format-list-checkbox</v-icon>
-        </template>
-      </v-treeview>
+  <v-treeview
+    v-model="tree"
+    :active.sync="active"
+    :items="items"
+    :load-children="fetchItems"
+    :open.sync="open"
+    dense
+    return-object
+    activatable
+    color="info"
+    transition
+    >
+    <template v-slot:prepend="{ item }">
+      <v-icon v-if="item.isInventoryCard && item.state === 0">mdi-card-bulleted-outline</v-icon>
+      <v-icon v-else-if="item.isInventoryCard && item.state === 1">mdi-card-bulleted-off-outline</v-icon>
+      <v-icon v-else-if="item.isDirectory">mdi-folder-open-outline</v-icon>
+      <v-icon v-else-if="item.isTheme">mdi-format-list-checks</v-icon>
+      <v-icon v-else-if="item.isRootObject">mdi-format-list-checkbox</v-icon>
+    </template>
+  </v-treeview>
 </template>
 
 <script>
+import { mapActions } from 'vuex'
+
 export default {
+  name: 'InventoryCardTree',
   data: () => ({
     tree: [],
     active: [],
-    avatar: null,
     open: [],
-    themes: [],
-    directoryMap: {},
-    inventoryCardMap: {},
     items: [
       {
         id: '0',
@@ -39,15 +39,22 @@ export default {
       }
     ]
   }),
+  computed: {
+    selectedItem () {
+      if (!this.active.length) return undefined
+      const item = this.active[0]
+      return item
+    }
+  },
   watch: {
-    themes (val) {
-    },
-    directoryMap (val) {
-    },
-    inventoryCardMap (val) {
+    selectedItem (newVal) {
+      this.onSelectItem(newVal)
     }
   },
   methods: {
+    ...mapActions('invCardTree', [
+      'onSelectItem'
+    ]),
     async fetchItems (item) {
       if (item.isRootObject) {
         try {
@@ -102,47 +109,6 @@ export default {
           console.warn(err)
         }
       }
-    },
-    getName (item) {
-      if (item.isTheme) {
-        return item.themeName
-      } else if (item.isDirectory) {
-        return item.directoryName
-      } else if (item.isInventoryCard) {
-        return item.cardName
-      }
-      return ''
-    },
-    gatherChildren (item) {
-      const childItems = []
-
-      if (item.isTheme || item.isDirectory) {
-        const childrenDir = this.directoryMap[item.id]
-        if (childrenDir !== null && childrenDir !== undefined) {
-          for (const directory of childrenDir) {
-            childItems.push({
-              ...directory,
-              isDirectory: true,
-              children: this.gatherChildren(directory),
-              name: this.getName(directory)
-            })
-          }
-        }
-      }
-      if (item.isDirectory) {
-        const childCards = this.inventoryCardMap[item.id]
-        if (childCards !== null && childCards !== undefined) {
-          for (const card of childCards) {
-            childItems.push({
-              ...card,
-              isInventoryCard: true,
-              name: this.getName(card)
-            })
-          }
-        }
-      }
-
-      return childItems
     }
   }
 }
