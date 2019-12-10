@@ -9,6 +9,7 @@
 </template>
 
 <script>
+import { mapGetters } from 'vuex'
 
 export default {
   name: 'EmployeesTable',
@@ -20,6 +21,11 @@ export default {
       { text: 'Имя сотрудника', value: 'employeeName' }
     ]
   }),
+  computed: {
+    ...mapGetters('invCardTree', {
+      backendAddress: 'getBackendAddress'
+    })
+  },
   mounted () {
     this.fetchData()
   },
@@ -27,7 +33,7 @@ export default {
     async fetchData () {
       try {
         this.loading = true
-        const response = await fetch('http://localhost:8081/employee/all')
+        const response = await fetch(this.backendAddress + '/employee/all')
         const json = await response.json()
         this.employees = [...json]
         this.totalEmployees = this.employees.length

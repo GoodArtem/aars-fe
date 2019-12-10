@@ -31,7 +31,8 @@ export default {
   }),
   computed: {
     ...mapGetters('invCardTree', {
-      selectedItem: 'getSelectedItem'
+      selectedItem: 'getSelectedItem',
+      backendAddress: 'getBackendAddress'
     })
   },
   mounted () {
@@ -46,7 +47,7 @@ export default {
     async fetchData () {
       try {
         this.loading = true
-        const response = await fetch('http://localhost:8081/onceOnlyIssue/getByInventoryCard/' + this.selectedItem.id)
+        const response = await fetch(this.backendAddress + '/onceOnlyIssue/getByInventoryCard/' + this.selectedItem.id)
         const json = await response.json()
         this.items = [...json]
         this.loading = false

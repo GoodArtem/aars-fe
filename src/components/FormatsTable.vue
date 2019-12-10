@@ -9,6 +9,7 @@
 </template>
 
 <script>
+import { mapGetters } from 'vuex'
 
 export default {
   name: 'FormatsTable',
@@ -20,6 +21,11 @@ export default {
       { text: 'Название формата', value: 'formatName' }
     ]
   }),
+  computed: {
+    ...mapGetters('invCardTree', {
+      backendAddress: 'getBackendAddress'
+    })
+  },
   mounted () {
     this.fetchData()
   },
@@ -27,7 +33,7 @@ export default {
     async fetchData () {
       try {
         this.loading = true
-        const response = await fetch('http://localhost:8081/format/all')
+        const response = await fetch(this.backendAddress + '/format/all')
         const json = await response.json()
         this.formats = [...json]
         this.totalFormats = this.formats.length

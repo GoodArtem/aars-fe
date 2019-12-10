@@ -22,7 +22,7 @@
 </template>
 
 <script>
-import { mapActions } from 'vuex'
+import { mapActions, mapGetters } from 'vuex'
 
 export default {
   name: 'InventoryCardTree',
@@ -40,6 +40,9 @@ export default {
     ]
   }),
   computed: {
+    ...mapGetters('invCardTree', {
+      backendAddress: 'getBackendAddress'
+    }),
     selectedItem () {
       if (!this.active.length) return undefined
       const item = this.active[0]
@@ -58,7 +61,7 @@ export default {
     async fetchItems (item) {
       if (item.isRootObject) {
         try {
-          const response = await fetch('http://localhost:8081/theme/all')
+          const response = await fetch(this.backendAddress + '/theme/all')
           const json = await response.json()
           const childItems = json.map(element => {
             element.isTheme = true
@@ -72,7 +75,7 @@ export default {
         }
       } else if (item.isTheme) {
         try {
-          const response = await fetch('http://localhost:8081/directory/getByTheme/' + item.id)
+          const response = await fetch(this.backendAddress + '/directory/getByTheme/' + item.id)
           const json = await response.json()
           const childItems = json.map(element => {
             element.isDirectory = true
@@ -86,7 +89,7 @@ export default {
         }
       } else if (item.isDirectory) {
         try {
-          const direcotryResponse = await fetch('http://localhost:8081/directory/getByDirectory/' + item.id)
+          const direcotryResponse = await fetch(this.backendAddress + '/directory/getByDirectory/' + item.id)
           const directoryJson = await direcotryResponse.json()
           const childDirectories = directoryJson.map(element => {
             element.isDirectory = true
@@ -95,7 +98,7 @@ export default {
             return element
           })
 
-          const invCardResponse = await fetch('http://localhost:8081/inventoryCard/getByDirectory/' + item.id)
+          const invCardResponse = await fetch(this.backendAddress + '/inventoryCard/getByDirectory/' + item.id)
           const invCardJson = await invCardResponse.json()
           const childCards = invCardJson.map(element => {
             element.isInventoryCard = true
