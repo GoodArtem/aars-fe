@@ -4,6 +4,7 @@
       v-model="drawer"
       :clipped="$vuetify.breakpoint.lgAndUp"
       app
+      temporary
     >
       <v-list>
         <v-list-item-group v-model="navItem" color="info">

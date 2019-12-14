@@ -29,19 +29,12 @@ export default {
   data: () => ({
     tree: [],
     active: [],
-    open: [],
-    items: [
-      {
-        id: '0',
-        name: 'Темы',
-        isRootObject: true,
-        children: []
-      }
-    ]
+    open: []
   }),
   computed: {
     ...mapGetters('invCardTree', {
-      backendAddress: 'getBackendAddress'
+      backendAddress: 'getBackendAddress',
+      items: 'getItems'
     }),
     selectedItem () {
       if (!this.active.length) return undefined
@@ -56,62 +49,11 @@ export default {
   },
   methods: {
     ...mapActions('invCardTree', [
-      'onSelectItem'
+      'onSelectItem',
+      'loadItems'
     ]),
     async fetchItems (item) {
-      if (item.isRootObject) {
-        try {
-          const response = await fetch(this.backendAddress + '/theme/all')
-          const json = await response.json()
-          const childItems = json.map(element => {
-            element.isTheme = true
-            element.children = []
-            element.name = element.themeName + ' ' + element.cipher
-            return element
-          })
-          item.children.push(...childItems)
-        } catch (err) {
-          console.warn(err)
-        }
-      } else if (item.isTheme) {
-        try {
-          const response = await fetch(this.backendAddress + '/directory/getByTheme/' + item.id)
-          const json = await response.json()
-          const childItems = json.map(element => {
-            element.isDirectory = true
-            element.children = []
-            element.name = element.directoryName
-            return element
-          })
-          item.children.push(...childItems)
-        } catch (err) {
-          console.warn(err)
-        }
-      } else if (item.isDirectory) {
-        try {
-          const direcotryResponse = await fetch(this.backendAddress + '/directory/getByDirectory/' + item.id)
-          const directoryJson = await direcotryResponse.json()
-          const childDirectories = directoryJson.map(element => {
-            element.isDirectory = true
-            element.children = []
-            element.name = element.directoryName
-            return element
-          })
-
-          const invCardResponse = await fetch(this.backendAddress + '/inventoryCard/getByDirectory/' + item.id)
-          const invCardJson = await invCardResponse.json()
-          const childCards = invCardJson.map(element => {
-            element.isInventoryCard = true
-            element.name = element.cardName + ' ' + element.designation
-            return element
-          })
-
-          const childItems = childDirectories.concat(childCards)
-          item.children.push(...childItems)
-        } catch (err) {
-          console.warn(err)
-        }
-      }
+      return this.loadItems(item)
     }
   }
 }
