@@ -1,6 +1,5 @@
 <template>
   <v-treeview
-    v-model="tree"
     :active.sync="active"
     :items="items"
     :load-children="fetchItems"
@@ -26,31 +25,34 @@ import { mapActions, mapGetters } from 'vuex'
 
 export default {
   name: 'InventoryCardTree',
-  data: () => ({
-    tree: [],
-    active: [],
-    open: []
-  }),
   computed: {
     ...mapGetters('invCardTree', {
-      backendAddress: 'getBackendAddress',
-      items: 'getItems'
+      items: 'getItems',
+      getterOpen: 'getOpenItems',
+      getterActive: 'getActiveItems'
     }),
-    selectedItem () {
-      if (!this.active.length) return undefined
-      const item = this.active[0]
-      return item
-    }
-  },
-  watch: {
-    selectedItem (newVal) {
-      this.onSelectItem(newVal)
+    open: {
+      get () {
+        return this.getterOpen
+      },
+      set (value) {
+        this.onExpandCollapseNode(value)
+      }
+    },
+    active: {
+      get () {
+        return this.getterActive
+      },
+      set (value) {
+        this.onChangeSelection(value)
+      }
     }
   },
   methods: {
     ...mapActions('invCardTree', [
-      'onSelectItem',
-      'loadItems'
+      'loadItems',
+      'onExpandCollapseNode',
+      'onChangeSelection'
     ]),
     async fetchItems (item) {
       return this.loadItems(item)

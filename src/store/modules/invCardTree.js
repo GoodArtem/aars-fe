@@ -2,7 +2,6 @@ import Vue from 'vue'
 import treeUtil from '../../utils/treeUtil'
 
 const state = {
-  selectedItem: undefined,
   backendAddress: window.location.protocol + '//' + window.location.hostname + ':8081',
   items: [
     {
@@ -11,26 +10,39 @@ const state = {
       isRootObject: true,
       children: []
     }
-  ]
+  ],
+  open: [],
+  active: []
 }
 
 // getters
 const getters = {
   getSelectedItem: (state, getters, rootState) => {
-    return state.selectedItem
+    if (!state.active.length) return undefined
+    const item = state.active[0]
+    return item
   },
   getBackendAddress: (state, getters, rootState) => {
     return state.backendAddress
   },
   getItems: (state, getters, rootState) => {
     return state.items
+  },
+  getOpenItems: (state, getters, rootState) => {
+    return state.open
+  },
+  getActiveItems: (state, getters, rootState) => {
+    return state.active
   }
 }
 
 // actions
 const actions = {
-  onSelectItem ({ commit, state }, item) {
-    commit('setSelectedItem', item)
+  onExpandCollapseNode ({ commit, state }, items) {
+    commit('setOpenItems', items)
+  },
+  onChangeSelection ({ commit, state }, items) {
+    commit('setActiveItems', items)
   },
   async loadItems ({ commit, state }, item) {
     if (item.isRootObject) {
@@ -91,8 +103,11 @@ const actions = {
 
 // mutations
 const mutations = {
-  setSelectedItem (state, item) {
-    state.selectedItem = item
+  setOpenItems (state, items) {
+    Vue.set(state, 'open', items)
+  },
+  setActiveItems (state, items) {
+    Vue.set(state, 'active', items)
   },
   setChildItems (state, payload) {
     if (payload.item.isRootObject) {
