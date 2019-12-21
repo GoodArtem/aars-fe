@@ -1,9 +1,14 @@
 <template>
     <v-dialog v-model="dialog" persistent max-width="600px">
-      <template v-slot:activator="{ on }">
-        <v-btn icon v-on="on">
-          <v-icon>{{ btnIcon }}</v-icon>
-        </v-btn>
+      <template v-slot:activator="{ on: dialog }">
+        <v-tooltip bottom>
+          <template v-slot:activator="{ on: tooltip }">
+            <v-btn icon v-on="{ ...dialog, ...tooltip }">
+              <v-icon>{{ btnIcon }}</v-icon>
+            </v-btn>
+          </template>
+          <span>{{ dialogTitle }}</span>
+        </v-tooltip>
       </template>
       <v-card>
         <v-card-title>
@@ -61,7 +66,7 @@ import { mapGetters, mapActions } from 'vuex'
 import treeUtil from '@/utils/treeUtil.js'
 
 export default {
-  name: 'ThemeDialog',
+  name: 'ThemeCreateEditDialog',
   props: {
     selectedTheme: {
       required: false,

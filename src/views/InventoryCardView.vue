@@ -11,11 +11,11 @@
           <v-toolbar color="info" dark>
             <v-toolbar-title>{{ titleSelectedItem }}</v-toolbar-title>
             <v-spacer></v-spacer>
-            <ThemeDialog></ThemeDialog>
-            <ThemeDialog  v-if="isTheme" btn-icon="mdi-pencil" v-bind:selected-theme="selectedItem"></ThemeDialog>
-            <v-btn icon>
+            <ThemeCreateEditDialog v-if="isRootObject"></ThemeCreateEditDialog>
+            <v-btn v-if="isRootObject" icon>
               <v-icon>mdi-magnify</v-icon>
             </v-btn>
+            <ThemeCreateEditDialog v-if="isTheme" btn-icon="mdi-pencil" v-bind:selected-theme="selectedItem"></ThemeCreateEditDialog>
           </v-toolbar>
           <InventoryCardGeneral v-if="isInventoryCard"></InventoryCardGeneral>
         </v-card>
@@ -28,7 +28,7 @@
 import { mapGetters } from 'vuex'
 import InventoryCardTree from '@/components/inv_card/InventoryCardTree.vue'
 import InventoryCardGeneral from '@/components/inv_card/InventoryCardGeneral.vue'
-import ThemeDialog from '@/components/dialogs/ThemeDialog.vue'
+import ThemeCreateEditDialog from '@/components/dialogs/theme/ThemeCreateEditDialog.vue'
 
 export default {
   name: 'InventoryCardView',
@@ -59,7 +59,7 @@ export default {
   components: {
     InventoryCardTree,
     InventoryCardGeneral,
-    ThemeDialog
+    ThemeCreateEditDialog
   }
 }
 </script>
