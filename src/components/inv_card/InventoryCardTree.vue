@@ -25,11 +25,21 @@ import { mapActions, mapGetters } from 'vuex'
 
 export default {
   name: 'InventoryCardTree',
+  created: function () {
+    this.prevOpened.push(...this.open)
+  },
+  mounted: function () {
+    this.onExpandCollapseNode(this.prevOpened)
+  },
+  data: () => ({
+    prevOpened: []
+  }),
   computed: {
     ...mapGetters('invCardTree', {
       items: 'getItems',
       getterOpen: 'getOpenItems',
-      getterActive: 'getActiveItems'
+      getterActive: 'getActiveItems',
+      updIdx: 'getUpdIdx'
     }),
     open: {
       get () {

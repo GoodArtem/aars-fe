@@ -12,7 +12,8 @@ const state = {
     }
   ],
   open: [],
-  active: []
+  active: [],
+  isItemsLoading: false
 }
 
 // getters
@@ -44,17 +45,31 @@ const actions = {
   onChangeSelection ({ commit, state }, items) {
     commit('setActiveItems', items)
   },
+  openBranchAndSetActive ({ commit, state }, payload) {
+    let timerId = setTimeout(function run () {
+      if (!state.isItemsLoading) {
+        const itemForOpening = payload.branchPath.shift()
+        if (itemForOpening !== undefined) {
+          commit('addOpenItem', itemForOpening)
+          timerId = setTimeout(run, 50)
+        } else {
+          const activeArray = [payload.active]
+          commit('updateOrAddChildIfNeeded', payload.active)
+          commit('setActiveItems', activeArray)
+          clearTimeout(timerId)
+        }
+      } else {
+        timerId = setTimeout(run, 50)
+      }
+    }, 1)
+  },
   async loadItems ({ commit, state }, item) {
+    commit('setItemsLoading', true)
     if (item.isRootObject) {
       try {
         const response = await fetch(state.backendAddress + '/theme/all')
         const json = await response.json()
-        const childItems = json.map(element => {
-          element.isTheme = true
-          element.children = []
-          element.name = element.themeName + ' ' + element.cipher
-          return element
-        })
+        const childItems = json.map(element => treeUtil.enrichTheme(element))
         commit('setChildItems', { item: item, childItems: childItems })
       } catch (err) {
         console.warn(err)
@@ -63,12 +78,7 @@ const actions = {
       try {
         const response = await fetch(state.backendAddress + '/directory/getByTheme/' + item.id)
         const json = await response.json()
-        const childItems = json.map(element => {
-          element.isDirectory = true
-          element.children = []
-          element.name = element.directoryName
-          return element
-        })
+        const childItems = json.map(element => treeUtil.enrichDirectory(element))
         commit('setChildItems', { item: item, childItems: childItems })
       } catch (err) {
         console.warn(err)
@@ -77,20 +87,11 @@ const actions = {
       try {
         const direcotryResponse = await fetch(state.backendAddress + '/directory/getByDirectory/' + item.id)
         const directoryJson = await direcotryResponse.json()
-        const childDirectories = directoryJson.map(element => {
-          element.isDirectory = true
-          element.children = []
-          element.name = element.directoryName
-          return element
-        })
+        const childDirectories = directoryJson.map(element => treeUtil.enrichDirectory(element))
 
         const invCardResponse = await fetch(state.backendAddress + '/inventoryCard/getByDirectory/' + item.id)
         const invCardJson = await invCardResponse.json()
-        const childCards = invCardJson.map(element => {
-          element.isInventoryCard = true
-          element.name = element.cardName + ' ' + element.designation
-          return element
-        })
+        const childCards = invCardJson.map(element => treeUtil.enrichInvCard(element))
 
         const childItems = childDirectories.concat(childCards)
         commit('setChildItems', { item: item, childItems: childItems })
@@ -98,6 +99,7 @@ const actions = {
         console.warn(err)
       }
     }
+    commit('setItemsLoading', false)
   }
 }
 
@@ -106,8 +108,39 @@ const mutations = {
   setOpenItems (state, items) {
     Vue.set(state, 'open', items)
   },
+  addOpenItem (state, item) {
+    Vue.set(state.open, state.open.length, { id: item })
+  },
+  updateOrAddChildIfNeeded (state, item) {
+    if (item.isTheme) {
+      const rootChildren = state.items[0].children
+      if (rootChildren) {
+        const itemIndex = treeUtil.indexOfTheme(rootChildren, item.id)
+        if (itemIndex === -1) {
+          Vue.set(rootChildren, rootChildren.length, item)
+        } else {
+          Vue.set(rootChildren, itemIndex, item)
+        }
+      }
+    } else if (item.isDirectory || item.isInventoryCard) {
+      const themeForUpdate = state.items[0].children.find(cur => cur.id === item.id)
+      const directoryForUpdate = treeUtil.findDirectory(item, themeForUpdate.children)
+      const parentChildren = directoryForUpdate ? directoryForUpdate.children : undefined
+      if (parentChildren) {
+        const itemIndex = treeUtil.idndexOfDirectoryOrInvCard(parentChildren, item.id, item.isDirectory)
+        if (itemIndex === -1) {
+          Vue.set(parentChildren, parentChildren.length, item)
+        } else {
+          Vue.set(parentChildren, itemIndex, item)
+        }
+      }
+    }
+  },
   setActiveItems (state, items) {
     Vue.set(state, 'active', items)
+  },
+  setItemsLoading (state, isLoading) {
+    Vue.set(state, 'isItemsLoading', isLoading)
   },
   setChildItems (state, payload) {
     if (payload.item.isRootObject) {
