@@ -9,10 +9,14 @@
     activatable
     color="info"
     transition
-    >
+  >
     <template v-slot:prepend="{ item }">
-      <v-icon v-if="item.isInventoryCard && item.state === 0">mdi-card-bulleted-outline</v-icon>
-      <v-icon v-else-if="item.isInventoryCard && item.state === 1">mdi-card-bulleted-off-outline</v-icon>
+      <v-icon v-if="item.isInventoryCard && item.state === 0"
+        >mdi-card-bulleted-outline</v-icon
+      >
+      <v-icon v-else-if="item.isInventoryCard && item.state === 1"
+        >mdi-card-bulleted-off-outline</v-icon
+      >
       <v-icon v-else-if="item.isDirectory">mdi-folder-open-outline</v-icon>
       <v-icon v-else-if="item.isTheme">mdi-format-list-checks</v-icon>
       <v-icon v-else-if="item.isRootObject">mdi-format-list-checkbox</v-icon>
@@ -25,10 +29,10 @@ import { mapActions, mapGetters } from 'vuex'
 
 export default {
   name: 'InventoryCardTree',
-  created: function () {
+  created: function() {
     this.prevOpened.push(...this.open)
   },
-  mounted: function () {
+  mounted: function() {
     this.onExpandCollapseNode(this.prevOpened)
   },
   data: () => ({
@@ -42,18 +46,18 @@ export default {
       updIdx: 'getUpdIdx'
     }),
     open: {
-      get () {
+      get() {
         return this.getterOpen
       },
-      set (value) {
+      set(value) {
         this.onExpandCollapseNode(value)
       }
     },
     active: {
-      get () {
+      get() {
         return this.getterActive
       },
-      set (value) {
+      set(value) {
         this.onChangeSelection(value)
       }
     }
@@ -64,7 +68,7 @@ export default {
       'onExpandCollapseNode',
       'onChangeSelection'
     ]),
-    async fetchItems (item) {
+    async fetchItems(item) {
       return this.loadItems(item)
     }
   }

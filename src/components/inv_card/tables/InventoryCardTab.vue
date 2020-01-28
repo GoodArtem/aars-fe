@@ -4,7 +4,13 @@
     <v-tab>Учет изменений</v-tab>
     <v-tab>Учет копий</v-tab>
     <v-tab>Разовые выдачи</v-tab>
-    <v-tab v-if="selectedItem&&selectedItem.isInventoryCard&&selectedItem.cardType === 1">
+    <v-tab
+      v-if="
+        selectedItem &&
+          selectedItem.isInventoryCard &&
+          selectedItem.cardType === 1
+      "
+    >
       Технологические документы
     </v-tab>
 

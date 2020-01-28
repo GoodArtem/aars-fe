@@ -17,20 +17,18 @@ export default {
     loading: true,
     totalFormats: 0,
     formats: [],
-    headers: [
-      { text: 'Название формата', value: 'formatName' }
-    ]
+    headers: [{ text: 'Название формата', value: 'formatName' }]
   }),
   computed: {
     ...mapGetters('invCardTree', {
       backendAddress: 'getBackendAddress'
     })
   },
-  mounted () {
+  mounted() {
     this.fetchData()
   },
   methods: {
-    async fetchData () {
+    async fetchData() {
       try {
         this.loading = true
         const response = await fetch(this.backendAddress + '/format/all')

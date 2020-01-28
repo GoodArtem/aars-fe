@@ -8,11 +8,7 @@
     >
       <v-list>
         <v-list-item-group v-model="navItem" color="info">
-          <v-list-item
-            v-for="(item, i) in navItems"
-            :key="i"
-            :to="item.to"
-          >
+          <v-list-item v-for="(item, i) in navItems" :key="i" :to="item.to">
             <v-list-item-icon>
               <v-icon v-text="item.icon"></v-icon>
             </v-list-item-icon>
@@ -30,12 +26,11 @@
       color="blue darken-3"
       dark
     >
-      <v-toolbar-title
-        style="width: 600px"
-        class="ml-0 pl-4"
-      >
+      <v-toolbar-title style="width: 600px" class="ml-0 pl-4">
         <v-app-bar-nav-icon @click.stop="drawer = !drawer" />
-        <span class="hidden-sm-and-down">Автоматизированная система учета и регистрации</span>
+        <span class="hidden-sm-and-down"
+          >Автоматизированная система учета и регистрации</span
+        >
       </v-toolbar-title>
       <v-spacer />
     </v-app-bar>

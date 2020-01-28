@@ -3,7 +3,7 @@
     <v-row no-gutters>
       <v-col cols="12">
         <v-card height="90vh" style="overflow-x:auto; overflow-y:auto">
-            <FormatsTable></FormatsTable>
+          <FormatsTable></FormatsTable>
         </v-card>
       </v-col>
     </v-row>

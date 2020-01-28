@@ -3,7 +3,7 @@
     <v-row dense>
       <v-col cols="4">
         <v-card height="90vh" style="overflow-x:auto; overflow-y:auto">
-            <InventoryCardTree></InventoryCardTree>
+          <InventoryCardTree></InventoryCardTree>
         </v-card>
       </v-col>
       <v-col cols="8">
@@ -15,7 +15,28 @@
             <v-btn v-if="isRootObject" icon>
               <v-icon>mdi-magnify</v-icon>
             </v-btn>
-            <ThemeCreateEditDialog v-if="isTheme" btn-icon="mdi-pencil" v-bind:selected-theme="selectedItem"></ThemeCreateEditDialog>
+            <ThemeCreateEditDialog
+              v-if="isTheme"
+              btn-icon="mdi-pencil"
+              v-bind:selected-theme="selectedItem"
+            ></ThemeCreateEditDialog>
+            <ThemeDeleteDialog
+              v-if="isTheme"
+              v-bind:selected-theme="selectedItem"
+            ></ThemeDeleteDialog>
+            <DirectoryCreateEditDialog
+              v-if="isDirectory"
+              v-bind:parent-directory="selectedItem"
+            ></DirectoryCreateEditDialog>
+            <DirectoryCreateEditDialog
+              v-if="isSimpleDirectory"
+              btn-icon="mdi-pencil"
+              v-bind:selected-directory="selectedItem"
+            ></DirectoryCreateEditDialog>
+            <DirectoryDeleteDialog
+              v-if="isSimpleDirectory"
+              v-bind:selected-directory="selectedItem"
+            ></DirectoryDeleteDialog>
           </v-toolbar>
           <InventoryCardGeneral v-if="isInventoryCard"></InventoryCardGeneral>
         </v-card>
@@ -29,6 +50,9 @@ import { mapGetters } from 'vuex'
 import InventoryCardTree from '@/components/inv_card/InventoryCardTree.vue'
 import InventoryCardGeneral from '@/components/inv_card/InventoryCardGeneral.vue'
 import ThemeCreateEditDialog from '@/components/dialogs/theme/ThemeCreateEditDialog.vue'
+import ThemeDeleteDialog from '@/components/dialogs/theme/ThemeDeleteDialog.vue'
+import DirectoryCreateEditDialog from '@/components/dialogs/directory/DirectoryCreateEditDialog.vue'
+import DirectoryDeleteDialog from '@/components/dialogs/directory/DirectoryDeleteDialog.vue'
 
 export default {
   name: 'InventoryCardView',
@@ -36,30 +60,36 @@ export default {
     ...mapGetters('invCardTree', {
       selectedItem: 'getSelectedItem'
     }),
-    titleSelectedItem () {
+    titleSelectedItem() {
       if (this.isRootObject) {
         return 'Архив инвентарных карточек'
       } else {
         return this.selectedItem.name
       }
     },
-    isRootObject () {
+    isRootObject() {
       return !this.selectedItem || this.selectedItem.isRootObject
     },
-    isTheme () {
+    isTheme() {
       return this.selectedItem && this.selectedItem.isTheme
     },
-    isDirectory () {
+    isDirectory() {
       return this.selectedItem && this.selectedItem.isDirectory
     },
-    isInventoryCard () {
+    isSimpleDirectory() {
+      return this.isDirectory && this.selectedItem.directoryType === 0
+    },
+    isInventoryCard() {
       return this.selectedItem && this.selectedItem.isInventoryCard
     }
   },
   components: {
     InventoryCardTree,
     InventoryCardGeneral,
-    ThemeCreateEditDialog
+    ThemeCreateEditDialog,
+    ThemeDeleteDialog,
+    DirectoryCreateEditDialog,
+    DirectoryDeleteDialog
   }
 }
 </script>

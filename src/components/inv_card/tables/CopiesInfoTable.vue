@@ -6,7 +6,14 @@
     class="elevation-1"
   >
     <template v-slot:item.copyDate="{ item }">
-      {{ new Date(item.copyDate).toISOString().substr(0, 10).split('-').reverse().join('.') }}
+      {{
+        new Date(item.copyDate)
+          .toISOString()
+          .substr(0, 10)
+          .split('-')
+          .reverse()
+          .join('.')
+      }}
     </template>
     <template v-slot:no-data>
       Нет данных
@@ -35,19 +42,23 @@ export default {
       backendAddress: 'getBackendAddress'
     })
   },
-  mounted () {
+  mounted() {
     this.fetchData()
   },
   watch: {
-    selectedItem () {
+    selectedItem() {
       this.fetchData()
     }
   },
   methods: {
-    async fetchData () {
+    async fetchData() {
       try {
         this.loading = true
-        const response = await fetch(this.backendAddress + '/copiesInfo/getByInventoryCard/' + this.selectedItem.id)
+        const response = await fetch(
+          this.backendAddress +
+            '/copiesInfo/getByInventoryCard/' +
+            this.selectedItem.id
+        )
         const json = await response.json()
         this.items = [...json]
         this.loading = false

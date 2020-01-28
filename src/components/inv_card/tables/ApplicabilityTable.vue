@@ -6,7 +6,14 @@
     color="info"
   >
     <template v-slot:item.applicabilityDate="{ item }">
-      {{ new Date(item.applicabilityDate).toISOString().substr(0, 10).split('-').reverse().join('.') }}
+      {{
+        new Date(item.applicabilityDate)
+          .toISOString()
+          .substr(0, 10)
+          .split('-')
+          .reverse()
+          .join('.')
+      }}
     </template>
     <template v-slot:no-data>
       Нет данных
@@ -35,19 +42,23 @@ export default {
       backendAddress: 'getBackendAddress'
     })
   },
-  mounted () {
+  mounted() {
     this.fetchData()
   },
   watch: {
-    selectedItem () {
+    selectedItem() {
       this.fetchData()
     }
   },
   methods: {
-    async fetchData () {
+    async fetchData() {
       try {
         this.loading = true
-        const response = await fetch(this.backendAddress + '/applicability/getByInventoryCard/' + this.selectedItem.id)
+        const response = await fetch(
+          this.backendAddress +
+            '/applicability/getByInventoryCard/' +
+            this.selectedItem.id
+        )
         const json = await response.json()
         this.items = [...json]
         this.loading = false

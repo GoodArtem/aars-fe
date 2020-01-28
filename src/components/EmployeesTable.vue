@@ -17,20 +17,18 @@ export default {
     loading: true,
     totalEmployees: 0,
     employees: [],
-    headers: [
-      { text: 'Имя сотрудника', value: 'employeeName' }
-    ]
+    headers: [{ text: 'Имя сотрудника', value: 'employeeName' }]
   }),
   computed: {
     ...mapGetters('invCardTree', {
       backendAddress: 'getBackendAddress'
     })
   },
-  mounted () {
+  mounted() {
     this.fetchData()
   },
   methods: {
-    async fetchData () {
+    async fetchData() {
       try {
         this.loading = true
         const response = await fetch(this.backendAddress + '/employee/all')

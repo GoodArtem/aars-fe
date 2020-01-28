@@ -2,7 +2,8 @@ import Vue from 'vue'
 import treeUtil from '../../utils/treeUtil'
 
 const state = {
-  backendAddress: window.location.protocol + '//' + window.location.hostname + ':8081',
+  backendAddress:
+    window.location.protocol + '//' + window.location.hostname + ':8081',
   items: [
     {
       id: '0',
@@ -39,16 +40,16 @@ const getters = {
 
 // actions
 const actions = {
-  onExpandCollapseNode ({ commit, state }, items) {
+  onExpandCollapseNode({ commit, state }, items) {
     commit('setOpenItems', items)
   },
-  onChangeSelection ({ commit, state }, items) {
+  onChangeSelection({ commit, state }, items) {
     commit('setActiveItems', items)
   },
-  openBranchAndSetActive ({ commit, state }, payload) {
-    let timerId = setTimeout(function run () {
+  openBranchAndSetActive({ commit, state }, payload) {
+    let timerId = setTimeout(function run() {
       if (!state.isItemsLoading) {
-        const itemForOpening = payload.branchPath.shift()
+        const itemForOpening = payload.branchPath.pop()
         if (itemForOpening !== undefined) {
           commit('addOpenItem', itemForOpening)
           timerId = setTimeout(run, 50)
@@ -63,7 +64,10 @@ const actions = {
       }
     }, 1)
   },
-  async loadItems ({ commit, state }, item) {
+  onDeleteItem({ commit, state }, item) {
+    commit('deleteItem', item)
+  },
+  async loadItems({ commit, state }, item) {
     commit('setItemsLoading', true)
     if (item.isRootObject) {
       try {
@@ -76,22 +80,34 @@ const actions = {
       }
     } else if (item.isTheme) {
       try {
-        const response = await fetch(state.backendAddress + '/directory/getByTheme/' + item.id)
+        const response = await fetch(
+          state.backendAddress + '/directory/getByTheme/' + item.id
+        )
         const json = await response.json()
-        const childItems = json.map(element => treeUtil.enrichDirectory(element))
+        const childItems = json.map(element =>
+          treeUtil.enrichDirectory(element)
+        )
         commit('setChildItems', { item: item, childItems: childItems })
       } catch (err) {
         console.warn(err)
       }
     } else if (item.isDirectory) {
       try {
-        const direcotryResponse = await fetch(state.backendAddress + '/directory/getByDirectory/' + item.id)
+        const direcotryResponse = await fetch(
+          state.backendAddress + '/directory/getByDirectory/' + item.id
+        )
         const directoryJson = await direcotryResponse.json()
-        const childDirectories = directoryJson.map(element => treeUtil.enrichDirectory(element))
+        const childDirectories = directoryJson.map(element =>
+          treeUtil.enrichDirectory(element)
+        )
 
-        const invCardResponse = await fetch(state.backendAddress + '/inventoryCard/getByDirectory/' + item.id)
+        const invCardResponse = await fetch(
+          state.backendAddress + '/inventoryCard/getByDirectory/' + item.id
+        )
         const invCardJson = await invCardResponse.json()
-        const childCards = invCardJson.map(element => treeUtil.enrichInvCard(element))
+        const childCards = invCardJson.map(element =>
+          treeUtil.enrichInvCard(element)
+        )
 
         const childItems = childDirectories.concat(childCards)
         commit('setChildItems', { item: item, childItems: childItems })
@@ -105,13 +121,13 @@ const actions = {
 
 // mutations
 const mutations = {
-  setOpenItems (state, items) {
+  setOpenItems(state, items) {
     Vue.set(state, 'open', items)
   },
-  addOpenItem (state, item) {
+  addOpenItem(state, item) {
     Vue.set(state.open, state.open.length, { id: item })
   },
-  updateOrAddChildIfNeeded (state, item) {
+  updateOrAddChildIfNeeded(state, item) {
     if (item.isTheme) {
       const rootChildren = state.items[0].children
       if (rootChildren) {
@@ -123,11 +139,22 @@ const mutations = {
         }
       }
     } else if (item.isDirectory || item.isInventoryCard) {
-      const themeForUpdate = state.items[0].children.find(cur => cur.id === item.id)
-      const directoryForUpdate = treeUtil.findDirectory(item, themeForUpdate.children)
-      const parentChildren = directoryForUpdate ? directoryForUpdate.children : undefined
+      const themeForUpdate = state.items[0].children.find(
+        cur => cur.id === item.themeId
+      )
+      const directoryForUpdate = treeUtil.findDirectory(
+        item.isDirectory ? item.parentId : item.directoryId,
+        themeForUpdate.children
+      )
+      const parentChildren = directoryForUpdate
+        ? directoryForUpdate.children
+        : undefined
       if (parentChildren) {
-        const itemIndex = treeUtil.idndexOfDirectoryOrInvCard(parentChildren, item.id, item.isDirectory)
+        const itemIndex = treeUtil.idndexOfDirectoryOrInvCard(
+          parentChildren,
+          item.id,
+          item.isDirectory
+        )
         if (itemIndex === -1) {
           Vue.set(parentChildren, parentChildren.length, item)
         } else {
@@ -136,21 +163,62 @@ const mutations = {
       }
     }
   },
-  setActiveItems (state, items) {
+  deleteItem(state, item) {
+    if (item.isTheme) {
+      const rootChildren = state.items[0].children
+      if (rootChildren) {
+        const itemIndex = treeUtil.indexOfTheme(rootChildren, item.id)
+        if (itemIndex !== -1) {
+          Vue.delete(rootChildren, itemIndex)
+          Vue.set(state, 'active', state.items)
+        }
+      }
+    } else if (item.isDirectory || item.isInventoryCard) {
+      const themeForUpdate = state.items[0].children.find(
+        cur => cur.id === item.themeId
+      )
+      const directoryForUpdate = treeUtil.findDirectory(
+        item.isDirectory ? item.parentId : item.directoryId,
+        themeForUpdate.children
+      )
+      const parentChildren = directoryForUpdate
+        ? directoryForUpdate.children
+        : undefined
+      if (parentChildren) {
+        const itemIndex = treeUtil.idndexOfDirectoryOrInvCard(
+          parentChildren,
+          item.id,
+          item.isDirectory
+        )
+        if (itemIndex !== -1) {
+          Vue.delete(parentChildren, itemIndex)
+          Vue.set(state, 'active', [directoryForUpdate])
+        }
+      }
+    }
+  },
+  setActiveItems(state, items) {
     Vue.set(state, 'active', items)
   },
-  setItemsLoading (state, isLoading) {
+  setItemsLoading(state, isLoading) {
     Vue.set(state, 'isItemsLoading', isLoading)
   },
-  setChildItems (state, payload) {
+  setChildItems(state, payload) {
     if (payload.item.isRootObject) {
       Vue.set(state.items[0], 'children', payload.childItems)
     } else if (payload.item.isTheme) {
-      const themeForUpdate = state.items[0].children.find(cur => cur.id === payload.item.id)
+      const themeForUpdate = state.items[0].children.find(
+        cur => cur.id === payload.item.id
+      )
       Vue.set(themeForUpdate, 'children', payload.childItems)
     } else if (payload.item.isDirectory) {
-      const themeForUpdate = state.items[0].children.find(cur => cur.id === payload.item.themeId)
-      const directoryForUpdate = treeUtil.findDirectory(payload.item, themeForUpdate.children)
+      const themeForUpdate = state.items[0].children.find(
+        cur => cur.id === payload.item.themeId
+      )
+      const directoryForUpdate = treeUtil.findDirectory(
+        payload.item.id,
+        themeForUpdate.children
+      )
       Vue.set(directoryForUpdate, 'children', payload.childItems)
     }
   }
