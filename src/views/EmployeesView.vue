@@ -11,12 +11,12 @@
 </template>
 
 <script>
-import EmployeesTable from '@/components/EmployeesTable.vue'
+import EmployeesTable from '@/components/EmployeesTable.vue';
 
 export default {
   name: 'EmployeesView',
   components: {
     EmployeesTable
   }
-}
+};
 </script>

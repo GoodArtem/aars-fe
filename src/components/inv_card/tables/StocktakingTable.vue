@@ -22,7 +22,10 @@
 </template>
 
 <script>
-import { mapGetters } from 'vuex'
+import { mapGetters } from 'vuex';
+import { RepositoryFactory } from '../../../utils/repository/RepositoryFactory';
+
+const repository = RepositoryFactory.get('stocktaking');
 
 export default {
   name: 'StocktakingTable',
@@ -37,35 +40,32 @@ export default {
     ]
   }),
   computed: {
-    ...mapGetters('invCardTree', {
+    ...mapGetters('invCardTreeStore', {
       selectedItem: 'getSelectedItem',
       backendAddress: 'getBackendAddress'
     })
   },
   mounted() {
-    this.fetchData()
+    this.fetchData();
   },
   watch: {
     selectedItem() {
-      this.fetchData()
+      this.fetchData();
     }
   },
   methods: {
     async fetchData() {
       try {
-        this.loading = true
-        const response = await fetch(
-          this.backendAddress +
-            '/stocktaking/getByInventoryCard/' +
-            this.selectedItem.id
-        )
-        const json = await response.json()
-        this.items = [...json]
-        this.loading = false
+        this.loading = true;
+        const response = await repository.getByInventoryCardId(
+          this.selectedItem.id
+        );
+        this.items = [...response.data];
+        this.loading = false;
       } catch (err) {
-        console.warn(err)
+        console.warn(err);
       }
     }
   }
-}
+};
 </script>

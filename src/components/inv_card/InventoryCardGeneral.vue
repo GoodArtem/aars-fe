@@ -13,8 +13,8 @@
 </template>
 
 <script>
-import InventoryCardInfo from './InventoryCardInfo.vue'
-import InventoryCardTab from './tables/InventoryCardTab.vue'
+import InventoryCardInfo from './InventoryCardInfo.vue';
+import InventoryCardTab from './tables/InventoryCardTab.vue';
 
 export default {
   name: 'InventoryCardGeneral',
@@ -22,5 +22,5 @@ export default {
     InventoryCardInfo,
     InventoryCardTab
   }
-}
+};
 </script>

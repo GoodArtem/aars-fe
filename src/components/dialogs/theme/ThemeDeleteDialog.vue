@@ -40,7 +40,7 @@
 </template>
 
 <script>
-import { mapGetters, mapActions } from 'vuex'
+import { mapGetters, mapActions } from 'vuex';
 
 export default {
   name: 'ThemeDeleteDialog',
@@ -59,15 +59,15 @@ export default {
     dialog: false
   }),
   computed: {
-    ...mapGetters('invCardTree', {
+    ...mapGetters('invCardTreeStore', {
       backendAddress: 'getBackendAddress'
     }),
     dialogTitle() {
-      return 'Удалить тему'
+      return 'Удалить тему';
     }
   },
   methods: {
-    ...mapActions('invCardTree', {
+    ...mapActions('invCardTreeStore', {
       deleteItem: 'onDeleteItem'
     }),
     async createOrUpdateTheme() {
@@ -79,14 +79,14 @@ export default {
               'Content-Type': 'application/json;charset=utf-8'
             },
             body: JSON.stringify(this.selectedTheme)
-          })
-          this.deleteItem(this.selectedTheme)
-          this.dialog = false
+          });
+          this.deleteItem(this.selectedTheme);
+          this.dialog = false;
         } catch (err) {
-          console.warn(err)
+          console.warn(err);
         }
       }
     }
   }
-}
+};
 </script>

@@ -46,41 +46,41 @@
 </template>
 
 <script>
-import { mapGetters } from 'vuex'
-import InventoryCardTree from '@/components/inv_card/InventoryCardTree.vue'
-import InventoryCardGeneral from '@/components/inv_card/InventoryCardGeneral.vue'
-import ThemeCreateEditDialog from '@/components/dialogs/theme/ThemeCreateEditDialog.vue'
-import ThemeDeleteDialog from '@/components/dialogs/theme/ThemeDeleteDialog.vue'
-import DirectoryCreateEditDialog from '@/components/dialogs/directory/DirectoryCreateEditDialog.vue'
-import DirectoryDeleteDialog from '@/components/dialogs/directory/DirectoryDeleteDialog.vue'
+import { mapGetters } from 'vuex';
+import InventoryCardTree from '@/components/inv_card/InventoryCardTree.vue';
+import InventoryCardGeneral from '@/components/inv_card/InventoryCardGeneral.vue';
+import ThemeCreateEditDialog from '@/components/dialogs/theme/ThemeCreateEditDialog.vue';
+import ThemeDeleteDialog from '@/components/dialogs/theme/ThemeDeleteDialog.vue';
+import DirectoryCreateEditDialog from '@/components/dialogs/directory/DirectoryCreateEditDialog.vue';
+import DirectoryDeleteDialog from '@/components/dialogs/directory/DirectoryDeleteDialog.vue';
 
 export default {
   name: 'InventoryCardView',
   computed: {
-    ...mapGetters('invCardTree', {
+    ...mapGetters('invCardTreeStore', {
       selectedItem: 'getSelectedItem'
     }),
     titleSelectedItem() {
       if (this.isRootObject) {
-        return 'Архив инвентарных карточек'
+        return 'Архив инвентарных карточек';
       } else {
-        return this.selectedItem.name
+        return this.selectedItem.name;
       }
     },
     isRootObject() {
-      return !this.selectedItem || this.selectedItem.isRootObject
+      return !this.selectedItem || this.selectedItem.isRootObject;
     },
     isTheme() {
-      return this.selectedItem && this.selectedItem.isTheme
+      return this.selectedItem && this.selectedItem.isTheme;
     },
     isDirectory() {
-      return this.selectedItem && this.selectedItem.isDirectory
+      return this.selectedItem && this.selectedItem.isDirectory;
     },
     isSimpleDirectory() {
-      return this.isDirectory && this.selectedItem.directoryType === 0
+      return this.isDirectory && this.selectedItem.directoryType === 0;
     },
     isInventoryCard() {
-      return this.selectedItem && this.selectedItem.isInventoryCard
+      return this.selectedItem && this.selectedItem.isInventoryCard;
     }
   },
   components: {
@@ -91,5 +91,5 @@ export default {
     DirectoryCreateEditDialog,
     DirectoryDeleteDialog
   }
-}
+};
 </script>

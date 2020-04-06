@@ -41,7 +41,7 @@
 </template>
 
 <script>
-import { mapGetters, mapActions } from 'vuex'
+import { mapGetters, mapActions } from 'vuex';
 
 export default {
   name: 'DirectoryDeleteDialog',
@@ -60,15 +60,15 @@ export default {
     dialog: false
   }),
   computed: {
-    ...mapGetters('invCardTree', {
+    ...mapGetters('invCardTreeStore', {
       backendAddress: 'getBackendAddress'
     }),
     dialogTitle() {
-      return 'Удалить директорию'
+      return 'Удалить директорию';
     }
   },
   methods: {
-    ...mapActions('invCardTree', {
+    ...mapActions('invCardTreeStore', {
       deleteItem: 'onDeleteItem'
     }),
     async createOrUpdateDirectory() {
@@ -80,14 +80,14 @@ export default {
               'Content-Type': 'application/json;charset=utf-8'
             },
             body: JSON.stringify(this.selectedDirectory)
-          })
-          this.deleteItem(this.selectedDirectory)
-          this.dialog = false
+          });
+          this.deleteItem(this.selectedDirectory);
+          this.dialog = false;
         } catch (err) {
-          console.warn(err)
+          console.warn(err);
         }
       }
     }
   }
-}
+};
 </script>

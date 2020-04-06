@@ -41,6 +41,8 @@
 </template>
 
 <script>
+import { mapActions } from 'vuex';
+
 export default {
   props: {
     source: String
@@ -53,6 +55,22 @@ export default {
       { text: 'Сотрудники', icon: 'mdi-contacts', to: '/employees' },
       { text: 'Форматы', icon: 'mdi-format-color-text', to: '/formats' }
     ]
-  })
-}
+  }),
+  methods: {
+    ...mapActions('employeeStore', {
+      loadEmployees: 'loadItems'
+    }),
+    ...mapActions('formatStore', {
+      loadFormats: 'loadItems'
+    })
+  },
+  created() {
+    this.loadEmployees();
+    this.loadFormats();
+  },
+  mounted() {
+    this.loadEmployees();
+    this.loadFormats();
+  }
+};
 </script>

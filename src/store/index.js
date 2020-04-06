@@ -1,14 +1,18 @@
-import Vue from 'vue'
-import Vuex from 'vuex'
-import invCardTree from './modules/invCardTree'
+import Vue from 'vue';
+import Vuex from 'vuex';
+import invCardTreeStore from './modules/invCardTreeStore';
+import employeeStore from './modules/employeeStore';
+import formatStore from './modules/formatStore';
 
-Vue.use(Vuex)
+Vue.use(Vuex);
 
 export default new Vuex.Store({
   state: {},
   mutations: {},
   actions: {},
   modules: {
-    invCardTree
+    invCardTreeStore,
+    employeeStore,
+    formatStore
   }
-})
+});

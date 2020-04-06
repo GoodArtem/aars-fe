@@ -80,16 +80,16 @@
 </template>
 
 <script>
-import { mapGetters } from 'vuex'
+import { mapGetters } from 'vuex';
 
 export default {
   name: 'InventoryCardInfo',
   computed: {
-    ...mapGetters('invCardTree', {
+    ...mapGetters('invCardTreeStore', {
       selectedItem: 'getSelectedItem'
     }),
     cardType() {
-      return this.selectedItem.cardType === 1 ? 'КД' : 'ТД'
+      return this.selectedItem.cardType === 1 ? 'КД' : 'ТД';
     },
     cardDate() {
       return new Date(this.selectedItem.cardDate)
@@ -97,7 +97,7 @@ export default {
         .substr(0, 10)
         .split('-')
         .reverse()
-        .join('.')
+        .join('.');
     },
     inventoryNumber() {
       if (this.selectedItem.inventoryNumberSuf) {
@@ -105,20 +105,20 @@ export default {
           this.selectedItem.inventoryNumber +
           ' ' +
           this.selectedItem.inventoryNumberSuf
-        )
+        );
       }
-      return this.selectedItem.inventoryNumber
+      return this.selectedItem.inventoryNumber;
     },
     formatName() {
       if (this.selectedItem.formatSet) {
         return this.selectedItem.formatSet
           .map(element => {
-            return element.formatName
+            return element.formatName;
           })
-          .join(',')
+          .join(',');
       }
-      return ''
+      return '';
     }
   }
-}
+};
 </script>

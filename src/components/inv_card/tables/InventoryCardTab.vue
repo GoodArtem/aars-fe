@@ -30,16 +30,16 @@
 </template>
 
 <script>
-import { mapGetters } from 'vuex'
-import ApplicabilityTable from './ApplicabilityTable.vue'
-import StocktakingTable from './StocktakingTable.vue'
-import CopiesInfoTable from './CopiesInfoTable.vue'
-import OnceOnlyIssueTable from './OnceOnlyIssueTable.vue'
+import { mapGetters } from 'vuex';
+import ApplicabilityTable from './ApplicabilityTable.vue';
+import StocktakingTable from './StocktakingTable.vue';
+import CopiesInfoTable from './CopiesInfoTable.vue';
+import OnceOnlyIssueTable from './OnceOnlyIssueTable.vue';
 
 export default {
   name: 'InventoryCardTab',
   computed: {
-    ...mapGetters('invCardTree', {
+    ...mapGetters('invCardTreeStore', {
       selectedItem: 'getSelectedItem'
     })
   },
@@ -49,5 +49,5 @@ export default {
     CopiesInfoTable,
     OnceOnlyIssueTable
   }
-}
+};
 </script>

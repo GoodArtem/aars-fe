@@ -14,50 +14,50 @@
       <v-card-title>
         <span class="headline">{{ dialogTitle }}</span>
       </v-card-title>
-      <v-form>
-        <v-card-text>
-          <v-container>
-            <v-row>
-              <v-col cols="12">
-                <v-text-field
-                  color="info"
-                  label="Название директории"
-                  required
-                  v-model="directoryName"
-                  :error-messages="directoryNameErrors"
-                  @input="$v.directoryName.$touch()"
-                  @blur="$v.directoryName.$touch()"
-                ></v-text-field>
-              </v-col>
-            </v-row>
-          </v-container>
-        </v-card-text>
-        <v-card-actions>
-          <v-spacer></v-spacer>
-          <v-btn color="blue darken-1" text @click="createOrUpdateDirectory"
-            >Сохранить</v-btn
-          >
-          <v-btn color="blue darken-1" text @click="dialog = false"
-            >Закрыть</v-btn
-          >
-        </v-card-actions>
-      </v-form>
+      <ValidationObserver ref="observer">
+        <v-form>
+          <v-card-text>
+            <v-container>
+              <v-row>
+                <v-col cols="12">
+                  <ValidationProvider
+                    v-slot="{ errors }"
+                    name="Название директории"
+                    rules="required"
+                  >
+                    <v-text-field
+                      color="info"
+                      label="Название директории"
+                      required
+                      v-model="directoryName"
+                      :error-messages="errors"
+                    ></v-text-field>
+                  </ValidationProvider>
+                </v-col>
+              </v-row>
+            </v-container>
+          </v-card-text>
+          <v-card-actions>
+            <v-spacer></v-spacer>
+            <v-btn color="blue darken-1" text @click="createOrUpdateDirectory"
+              >Сохранить</v-btn
+            >
+            <v-btn color="blue darken-1" text @click="dialog = false"
+              >Закрыть</v-btn
+            >
+          </v-card-actions>
+        </v-form>
+      </ValidationObserver>
     </v-card>
   </v-dialog>
 </template>
 
 <script>
-import { validationMixin } from 'vuelidate'
-import { required } from 'vuelidate/lib/validators'
-import { mapGetters, mapActions } from 'vuex'
-import treeUtil from '@/utils/treeUtil.js'
+import { mapGetters, mapActions } from 'vuex';
+import treeUtil from '@/utils/treeUtil.js';
 
 export default {
   name: 'DirectoryCreateEditDialog',
-  mixins: [validationMixin],
-  validations: {
-    directoryName: { required }
-  },
   props: {
     selectedDirectory: {
       required: false,
@@ -76,10 +76,11 @@ export default {
   },
   data: () => ({
     dialog: false,
-    directoryName: null
+    directoryName: null,
+    isValid: null
   }),
   computed: {
-    ...mapGetters('invCardTree', {
+    ...mapGetters('invCardTreeStore', {
       backendAddress: 'getBackendAddress'
     }),
     directory() {
@@ -87,42 +88,37 @@ export default {
         directoryName: this.selectedDirectory
           ? this.selectedDirectory.directoryName
           : null
-      }
+      };
     },
     dialogTitle() {
       return this.selectedDirectory
         ? 'Редактировать директорию'
-        : 'Создать директорию'
-    },
-    directoryNameErrors() {
-      const errors = []
-      if (!this.$v.directoryName.$dirty) return errors
-      !this.$v.directoryName.required &&
-        errors.push('Имя директории обязательно для заполнения')
-      return errors
+        : 'Создать директорию';
     }
   },
   watch: {
     dialog: function(oldVal, newVal) {
-      this.$v.$reset()
+      this.$refs.observer.reset();
       this.directoryName = this.selectedDirectory
         ? this.selectedDirectory.directoryName
-        : null
+        : null;
     }
   },
   methods: {
-    ...mapActions('invCardTree', ['openBranchAndSetActive']),
+    ...mapActions('invCardTreeStore', ['openBranchAndSetActive']),
     async createOrUpdateDirectory() {
-      this.$v.$touch()
-      if (this.$v.$invalid) {
-        alert('Введены некорректные данные!')
-        return
+      this.$refs.observer.validate().then(success => {
+        this.isValid = success;
+      });
+      if (!isValid) {
+        alert('Введены некорректные данные!');
+        return;
       }
       if (this.selectedDirectory) {
         const directory = {
           id: this.selectedDirectory.id,
           directoryName: this.directoryName
-        }
+        };
         try {
           const response = await fetch(
             this.backendAddress + '/directory/update',
@@ -133,20 +129,20 @@ export default {
               },
               body: JSON.stringify(directory)
             }
-          )
-          const updatedItem = await response.json()
-          updatedItem.name = updatedItem.directoryName
-          const mergedItem = { ...this.selectedDirectory, ...updatedItem }
+          );
+          const updatedItem = await response.json();
+          updatedItem.name = updatedItem.directoryName;
+          const mergedItem = { ...this.selectedDirectory, ...updatedItem };
           const pathToItem = mergedItem.parentId
             ? [mergedItem.parentId]
-            : [mergedItem.themeId]
+            : [mergedItem.themeId];
           this.openBranchAndSetActive({
             branchPath: pathToItem,
             active: mergedItem
-          })
-          this.dialog = false
+          });
+          this.dialog = false;
         } catch (err) {
-          console.warn(err)
+          console.warn(err);
         }
       } else {
         try {
@@ -154,7 +150,7 @@ export default {
             directoryName: this.directoryName,
             parentId: this.parentDirectory.id,
             themeId: this.parentDirectory.themeId
-          }
+          };
           const response = await fetch(
             this.backendAddress + '/directory/create',
             {
@@ -164,22 +160,22 @@ export default {
               },
               body: JSON.stringify(directory)
             }
-          )
-          const createdItem = await response.json()
-          treeUtil.enrichDirectory(createdItem)
+          );
+          const createdItem = await response.json();
+          treeUtil.enrichDirectory(createdItem);
           const pathToItem = createdItem.parentId
             ? [createdItem.parentId]
-            : [createdItem.themeId]
+            : [createdItem.themeId];
           this.openBranchAndSetActive({
             branchPath: pathToItem,
             active: createdItem
-          })
-          this.dialog = false
+          });
+          this.dialog = false;
         } catch (err) {
-          console.warn(err)
+          console.warn(err);
         }
       }
     }
   }
-}
+};
 </script>

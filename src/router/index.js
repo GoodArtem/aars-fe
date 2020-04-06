@@ -1,10 +1,10 @@
-import Vue from 'vue'
-import VueRouter from 'vue-router'
-import InventoryCardView from '../views/InventoryCardView.vue'
-import EmployeesView from '../views/EmployeesView.vue'
-import FormatsView from '../views/FormatsView.vue'
+import Vue from 'vue';
+import VueRouter from 'vue-router';
+import InventoryCardView from '../views/InventoryCardView.vue';
+import EmployeesView from '../views/EmployeesView.vue';
+import FormatsView from '../views/FormatsView.vue';
 
-Vue.use(VueRouter)
+Vue.use(VueRouter);
 
 const routes = [
   {
@@ -22,10 +22,10 @@ const routes = [
     name: 'formats',
     component: FormatsView
   }
-]
+];
 
 const router = new VueRouter({
   routes
-})
+});
 
-export default router
+export default router;

@@ -25,21 +25,21 @@
 </template>
 
 <script>
-import { mapActions, mapGetters } from 'vuex'
+import { mapActions, mapGetters } from 'vuex';
 
 export default {
   name: 'InventoryCardTree',
   created: function() {
-    this.prevOpened.push(...this.open)
+    this.prevOpened.push(...this.open);
   },
   mounted: function() {
-    this.onExpandCollapseNode(this.prevOpened)
+    this.onExpandCollapseNode(this.prevOpened);
   },
   data: () => ({
     prevOpened: []
   }),
   computed: {
-    ...mapGetters('invCardTree', {
+    ...mapGetters('invCardTreeStore', {
       items: 'getItems',
       getterOpen: 'getOpenItems',
       getterActive: 'getActiveItems',
@@ -47,30 +47,30 @@ export default {
     }),
     open: {
       get() {
-        return this.getterOpen
+        return this.getterOpen;
       },
       set(value) {
-        this.onExpandCollapseNode(value)
+        this.onExpandCollapseNode(value);
       }
     },
     active: {
       get() {
-        return this.getterActive
+        return this.getterActive;
       },
       set(value) {
-        this.onChangeSelection(value)
+        this.onChangeSelection(value);
       }
     }
   },
   methods: {
-    ...mapActions('invCardTree', [
+    ...mapActions('invCardTreeStore', [
       'loadItems',
       'onExpandCollapseNode',
       'onChangeSelection'
     ]),
     async fetchItems(item) {
-      return this.loadItems(item)
+      return this.loadItems(item);
     }
   }
-}
+};
 </script>

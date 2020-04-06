@@ -1,0 +1,44 @@
+import Vue from 'vue';
+import { INVENTORY_CARD } from '../../../plugins/axios';
+import { CREATE } from '../../../plugins/axios';
+import { UPDATE } from '../../../plugins/axios';
+import { DELETE } from '../../../plugins/axios';
+import { GET_BY_CONDITION } from '../../../plugins/axios';
+import { GET_BY_THEME_ID } from '../../../plugins/axios';
+import { GET_BY_DIRECTORY_ID } from '../../../plugins/axios';
+
+export default {
+  getById(id) {
+    let promise = Vue.axios.get(`${INVENTORY_CARD}/${id}`);
+    return promise;
+  },
+  create(payload) {
+    let promise = Vue.axios.post(`${INVENTORY_CARD}${CREATE}`, payload);
+    return promise;
+  },
+  update(payload) {
+    let promise = Vue.axios.post(`${INVENTORY_CARD}${UPDATE}`, payload);
+    return promise;
+  },
+  delete(payload) {
+    let promise = Vue.axios.post(`${INVENTORY_CARD}${DELETE}`, payload);
+    return promise;
+  },
+  getByCondtition(payload) {
+    let promise = Vue.axios.post(
+      `${INVENTORY_CARD}${GET_BY_CONDITION}`,
+      payload
+    );
+    return promise;
+  },
+  getByThemeId(id) {
+    let promise = Vue.axios.get(`${INVENTORY_CARD}${GET_BY_THEME_ID}/${id}`);
+    return promise;
+  },
+  getByDirectoryId(id) {
+    let promise = Vue.axios.get(
+      `${INVENTORY_CARD}${GET_BY_DIRECTORY_ID}/${id}`
+    );
+    return promise;
+  }
+};

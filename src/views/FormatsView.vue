@@ -11,12 +11,12 @@
 </template>
 
 <script>
-import FormatsTable from '@/components/FormatsTable.vue'
+import FormatsTable from '@/components/FormatsTable.vue';
 
 export default {
   name: 'FormatsView',
   components: {
     FormatsTable
   }
-}
+};
 </script>
