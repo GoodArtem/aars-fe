@@ -22,11 +22,10 @@
                 <v-col cols="12">
                   <ValidationProvider
                     v-slot="{ errors }"
-                    name="Название темы"
+                    name="'Название темы'"
                     rules="required"
                   >
                     <v-text-field
-                      color="info"
                       label="Название темы"
                       required
                       v-model="themeName"
@@ -39,11 +38,10 @@
                 <v-col cols="12">
                   <ValidationProvider
                     v-slot="{ errors }"
-                    name="Шифр"
+                    name="'Шифр'"
                     rules="required"
                   >
                     <v-text-field
-                      color="info"
                       label="Шифр"
                       required
                       v-model="cipher"
@@ -65,7 +63,7 @@
                     <template v-slot:activator="{ on }">
                       <ValidationProvider
                         v-slot="{ errors }"
-                        name="Дата закладки в архив"
+                        name="'Дата закладки в архив'"
                         rules="required"
                       >
                         <v-text-field
@@ -80,6 +78,7 @@
                     </template>
                     <v-date-picker
                       v-model="archiveDate"
+                      locale="ru"
                       @input="archiveDateMenu = false"
                     ></v-date-picker>
                   </v-menu>
@@ -105,6 +104,9 @@
 <script>
 import { mapGetters, mapActions } from 'vuex';
 import treeUtil from '@/utils/treeUtil.js';
+import { RepositoryFactory } from '../../../utils/repository/RepositoryFactory';
+
+const repository = RepositoryFactory.get('theme');
 
 export default {
   name: 'ThemeCreateEditDialog',
@@ -129,6 +131,9 @@ export default {
   }),
   watch: {
     dialog: function(oldVal, newVal) {
+      if (this.$refs.observer) {
+        this.$refs.observer.reset();
+      }
       this.themeName = this.selectedTheme ? this.selectedTheme.themeName : null;
       this.cipher = this.selectedTheme ? this.selectedTheme.cipher : null;
       this.archiveDate = this.selectedTheme
@@ -147,63 +152,40 @@ export default {
   methods: {
     ...mapActions('invCardTreeStore', ['openBranchAndSetActive']),
     async createOrUpdateTheme() {
-      this.$refs.observer.validate().then(success => {
+      await this.$refs.observer.validate().then(success => {
         this.isValid = success;
+        if (!success) {
+          alert('Введены некорректные данные!');
+        }
+        return;
       });
-      if (!isValid) {
-        alert('Введены некорректные данные!');
+      if (!this.isValid) {
         return;
       }
-      if (this.selectedTheme) {
-        const theme = {
-          id: this.selectedTheme.id,
-          themeName: this.themeName,
-          cipher: this.cipher,
-          archiveDate: new Date(this.archiveDate).toISOString()
-        };
-        try {
-          const response = await fetch(this.backendAddress + '/theme/update', {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json;charset=utf-8'
-            },
-            body: JSON.stringify(theme)
-          });
-          const updatedItem = await response.json();
-          updatedItem.name = updatedItem.themeName + ' ' + updatedItem.cipher;
-          const mergedItem = { ...this.selectedTheme, ...updatedItem };
-          this.openBranchAndSetActive({
-            branchPath: ['0'],
-            active: mergedItem
-          });
-          this.dialog = false;
-        } catch (err) {
-          console.warn(err);
-        }
-      } else {
+      try {
+        let createdOrUpdatedItem = null;
         const theme = {
           themeName: this.themeName,
           cipher: this.cipher,
           archiveDate: new Date(this.archiveDate).toISOString()
         };
-        try {
-          const response = await fetch(this.backendAddress + '/theme/create', {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json;charset=utf-8'
-            },
-            body: JSON.stringify(theme)
-          });
-          const createdItem = await response.json();
-          treeUtil.enrichTheme(createdItem);
-          this.openBranchAndSetActive({
-            branchPath: ['0'],
-            active: createdItem
-          });
-          this.dialog = false;
-        } catch (err) {
-          console.warn(err);
+        if (this.selectedTheme) {
+          theme.id = this.selectedTheme.id;
+          const response = await repository.update(theme);
+          console.warn(this.selectedTheme);
+          createdOrUpdatedItem = { ...this.selectedTheme, ...response.data };
+        } else {
+          const response = await repository.create(theme);
+          createdOrUpdatedItem = response.data;
         }
+        treeUtil.enrichTheme(createdOrUpdatedItem);
+        this.openBranchAndSetActive({
+          branchPath: ['0'],
+          active: createdOrUpdatedItem
+        });
+        this.dialog = false;
+      } catch (err) {
+        console.warn(err);
       }
     }
   }

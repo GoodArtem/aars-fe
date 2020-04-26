@@ -6,6 +6,7 @@ import { DELETE } from '../../../plugins/axios';
 import { GET_BY_CONDITION } from '../../../plugins/axios';
 import { GET_BY_THEME_ID } from '../../../plugins/axios';
 import { GET_BY_DIRECTORY_ID } from '../../../plugins/axios';
+import { GET_NEXT_SEQUENCE_INVENTORY_NUMBER } from '../../../plugins/axios';
 
 export default {
   getById(id) {
@@ -39,6 +40,27 @@ export default {
     let promise = Vue.axios.get(
       `${INVENTORY_CARD}${GET_BY_DIRECTORY_ID}/${id}`
     );
+    return promise;
+  },
+  getNextSequenceInventoryNumber(parentDirectoryId) {
+    let promise = Vue.axios.get(
+      `${INVENTORY_CARD}${GET_NEXT_SEQUENCE_INVENTORY_NUMBER}?parentDirectoryId=${parentDirectoryId}`
+    );
+    return promise;
+  },
+  downloadPdf(payload) {
+    let promise = Vue.axios({
+      url: `${INVENTORY_CARD}/downloadPdf/${payload.id}`,
+      method: 'GET',
+      responseType: 'blob'
+    }).then(response => {
+      const url = window.URL.createObjectURL(new Blob([response.data]));
+      const link = document.createElement('a');
+      link.href = url;
+      link.setAttribute('download', `${payload.name}.pdf`);
+      document.body.appendChild(link);
+      link.click();
+    });
     return promise;
   }
 };

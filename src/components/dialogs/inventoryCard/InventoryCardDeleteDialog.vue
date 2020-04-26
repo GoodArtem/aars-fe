@@ -19,8 +19,9 @@
           <v-row>
             <v-col cols="12">
               <v-card-text>
-                Вы действительно хотите удалить тему "{{ selectedTheme.name }}"
-                и все ее содержимое?
+                Вы действительно хотите удалить инвентарную карту "{{
+                  selectedCard.name
+                }}" и все ее содержимое?
               </v-card-text>
             </v-col>
           </v-row>
@@ -28,7 +29,9 @@
       </v-card-text>
       <v-card-actions>
         <v-spacer></v-spacer>
-        <v-btn color="blue darken-1" text @click="deleteTheme">Удалить</v-btn>
+        <v-btn color="blue darken-1" text @click="deleteInventoryCard"
+          >Удалить</v-btn
+        >
         <v-btn color="blue darken-1" text @click="dialog = false"
           >Закрыть</v-btn
         >
@@ -38,15 +41,15 @@
 </template>
 
 <script>
-import { mapGetters, mapActions } from 'vuex';
+import { mapActions } from 'vuex';
 import { RepositoryFactory } from '../../../utils/repository/RepositoryFactory';
 
-const repository = RepositoryFactory.get('theme');
+const repository = RepositoryFactory.get('inventoryCard');
 
 export default {
-  name: 'ThemeDeleteDialog',
+  name: 'InventoryCardDeleteDialog',
   props: {
-    selectedTheme: {
+    selectedCard: {
       required: true,
       type: Object
     },
@@ -60,18 +63,18 @@ export default {
   }),
   computed: {
     dialogTitle() {
-      return 'Удалить тему';
+      return 'Удалить инвентарную карточку';
     }
   },
   methods: {
     ...mapActions('invCardTreeStore', {
       deleteItem: 'onDeleteItem'
     }),
-    async deleteTheme() {
-      if (this.selectedTheme) {
+    async deleteInventoryCard() {
+      if (this.selectedCard) {
         try {
-          await repository.delete(this.selectedTheme);
-          this.deleteItem(this.selectedTheme);
+          await repository.delete(this.selectedCard);
+          this.deleteItem(this.selectedCard);
           this.dialog = false;
         } catch (err) {
           console.warn(err);

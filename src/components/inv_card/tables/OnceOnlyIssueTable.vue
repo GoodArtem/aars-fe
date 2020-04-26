@@ -4,6 +4,7 @@
     :items="items"
     :loading="loading"
     class="elevation-1"
+    locale="ru"
   >
     <template v-slot:item.issueDate="{ item }">
       {{

@@ -29,11 +29,11 @@
       </v-card-text>
       <v-card-actions>
         <v-spacer></v-spacer>
+        <v-btn color="blue darken-1" text @click="deleteDirectory"
+          >Удалить</v-btn
+        >
         <v-btn color="blue darken-1" text @click="dialog = false"
           >Закрыть</v-btn
-        >
-        <v-btn color="blue darken-1" text @click="createOrUpdateDirectory"
-          >Удалить</v-btn
         >
       </v-card-actions>
     </v-card>
@@ -41,15 +41,17 @@
 </template>
 
 <script>
-import { mapGetters, mapActions } from 'vuex';
+import { mapActions } from 'vuex';
+import { RepositoryFactory } from '../../../utils/repository/RepositoryFactory';
+
+const repository = RepositoryFactory.get('directory');
 
 export default {
   name: 'DirectoryDeleteDialog',
   props: {
     selectedDirectory: {
-      required: false,
-      type: Object,
-      default: () => undefined
+      required: true,
+      type: Object
     },
     btnIcon: {
       type: String,
@@ -60,9 +62,6 @@ export default {
     dialog: false
   }),
   computed: {
-    ...mapGetters('invCardTreeStore', {
-      backendAddress: 'getBackendAddress'
-    }),
     dialogTitle() {
       return 'Удалить директорию';
     }
@@ -71,16 +70,10 @@ export default {
     ...mapActions('invCardTreeStore', {
       deleteItem: 'onDeleteItem'
     }),
-    async createOrUpdateDirectory() {
+    async deleteDirectory() {
       if (this.selectedDirectory) {
         try {
-          await fetch(this.backendAddress + '/directory/delete', {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json;charset=utf-8'
-            },
-            body: JSON.stringify(this.selectedDirectory)
-          });
+          await repository.delete(this.selectedDirectory);
           this.deleteItem(this.selectedDirectory);
           this.dialog = false;
         } catch (err) {

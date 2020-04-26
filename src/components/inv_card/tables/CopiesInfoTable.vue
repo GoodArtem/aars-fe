@@ -3,6 +3,7 @@
     :headers="headers"
     :items="items"
     :loading="loading"
+    locale="ru"
     class="elevation-1"
   >
     <template v-slot:item.copyDate="{ item }">

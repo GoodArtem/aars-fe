@@ -7,7 +7,7 @@
       temporary
     >
       <v-list>
-        <v-list-item-group v-model="navItem" color="info">
+        <v-list-item-group v-model="navItem">
           <v-list-item v-for="(item, i) in navItems" :key="i" :to="item.to">
             <v-list-item-icon>
               <v-icon v-text="item.icon"></v-icon>
@@ -37,11 +37,18 @@
     <v-content>
       <router-view></router-view>
     </v-content>
+    <v-snackbar v-model="snackbar" :color="snackbarColor" top right>
+      {{ snackbarText }}
+      <v-btn icon @click="snackbar = false">
+        <v-icon color="white">mdi-close</v-icon>
+      </v-btn>
+    </v-snackbar>
   </v-app>
 </template>
 
 <script>
 import { mapActions } from 'vuex';
+import { EventBus } from './plugins/event-bus';
 
 export default {
   props: {
@@ -54,7 +61,10 @@ export default {
       { text: 'Архив', icon: 'mdi-folder-zip-outline', to: '/' },
       { text: 'Сотрудники', icon: 'mdi-contacts', to: '/employees' },
       { text: 'Форматы', icon: 'mdi-format-color-text', to: '/formats' }
-    ]
+    ],
+    snackbar: false,
+    snackbarText: '',
+    snackbarColor: ''
   }),
   methods: {
     ...mapActions('employeeStore', {
@@ -71,6 +81,37 @@ export default {
   mounted() {
     this.loadEmployees();
     this.loadFormats();
+
+    EventBus.$on('global-error', payload => {
+      // console.log('global-error: ' + payload);
+      this.snackbar = true;
+      let message;
+
+      if (payload.message) {
+        message = payload.message;
+        if (payload.extra && payload.extra.changeRequestId) {
+          let changeRequest = this.getChangeRequestById(
+            payload.extra.changeRequestId
+          );
+          message = `${message} [${changeRequest.name}]`;
+        }
+      } else {
+        message = payload;
+      }
+
+      this.snackbarText = message;
+      this.snackbarColor = 'error';
+    });
+    EventBus.$on('global-warning', payload => {
+      this.snackbar = true;
+      this.snackbarText = payload;
+      this.snackbarColor = 'warning';
+    });
+    EventBus.$on('global-info', payload => {
+      this.snackbar = true;
+      this.snackbarText = payload;
+      this.snackbarColor = 'info';
+    });
   }
 };
 </script>

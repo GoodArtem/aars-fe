@@ -7,7 +7,7 @@
     dense
     return-object
     activatable
-    color="info"
+    color="primary"
     transition
   >
     <template v-slot:prepend="{ item }">

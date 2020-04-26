@@ -1,5 +1,5 @@
 <template>
-  <v-tabs color="info">
+  <v-tabs color="primary">
     <v-tab>Применяемость</v-tab>
     <v-tab>Учет изменений</v-tab>
     <v-tab>Учет копий</v-tab>
@@ -13,7 +13,6 @@
     >
       Технологические документы
     </v-tab>
-
     <v-tab-item>
       <ApplicabilityTable></ApplicabilityTable>
     </v-tab-item>

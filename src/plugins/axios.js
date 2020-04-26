@@ -23,6 +23,8 @@ export const GET_BY_CONDITION = '/getByCondition';
 export const GET_BY_INVENTORY_CARD_ID = '/getByInventoryCard';
 export const GET_BY_THEME_ID = '/getByTheme';
 export const GET_BY_DIRECTORY_ID = '/getByDirectory';
+export const GET_NEXT_SEQUENCE_INVENTORY_NUMBER =
+  '/getNextSequenceInventoryNumber';
 
 const backendServiceUrl = 'http://localhost:8081';
 

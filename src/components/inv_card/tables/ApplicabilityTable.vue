@@ -1,10 +1,5 @@
 <template>
-  <v-data-table
-    :headers="headers"
-    :items="items"
-    :loading="loading"
-    color="info"
-  >
+  <v-data-table :headers="headers" :items="items" :loading="loading">
     <template v-slot:item.applicabilityDate="{ item }">
       {{
         new Date(item.applicabilityDate)

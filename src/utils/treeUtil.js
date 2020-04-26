@@ -38,13 +38,17 @@ export default {
   },
   enrichTheme(item) {
     item.isTheme = true;
-    item.children = [];
+    if (!item.children) {
+      item.children = [];
+    }
     item.name = item.themeName + ' ' + item.cipher;
     return item;
   },
   enrichDirectory(item) {
     item.isDirectory = true;
-    item.children = [];
+    if (!item.children) {
+      item.children = [];
+    }
     item.name = item.directoryName;
     return item;
   },

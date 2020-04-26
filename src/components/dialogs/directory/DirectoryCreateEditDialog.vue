@@ -22,11 +22,10 @@
                 <v-col cols="12">
                   <ValidationProvider
                     v-slot="{ errors }"
-                    name="Название директории"
+                    name="'Название директории'"
                     rules="required"
                   >
                     <v-text-field
-                      color="info"
                       label="Название директории"
                       required
                       v-model="directoryName"
@@ -55,6 +54,9 @@
 <script>
 import { mapGetters, mapActions } from 'vuex';
 import treeUtil from '@/utils/treeUtil.js';
+import { RepositoryFactory } from '../../../utils/repository/RepositoryFactory';
+
+const repository = RepositoryFactory.get('directory');
 
 export default {
   name: 'DirectoryCreateEditDialog',
@@ -98,7 +100,9 @@ export default {
   },
   watch: {
     dialog: function(oldVal, newVal) {
-      this.$refs.observer.reset();
+      if (this.$refs.observer) {
+        this.$refs.observer.reset();
+      }
       this.directoryName = this.selectedDirectory
         ? this.selectedDirectory.directoryName
         : null;
@@ -107,73 +111,45 @@ export default {
   methods: {
     ...mapActions('invCardTreeStore', ['openBranchAndSetActive']),
     async createOrUpdateDirectory() {
-      this.$refs.observer.validate().then(success => {
+      await this.$refs.observer.validate().then(success => {
         this.isValid = success;
+        if (!success) {
+          alert('Введены некорректные данные!');
+        }
+        return;
       });
-      if (!isValid) {
-        alert('Введены некорректные данные!');
+      if (!this.isValid) {
         return;
       }
-      if (this.selectedDirectory) {
+      try {
+        let createdOrUpdatedItem = null;
         const directory = {
-          id: this.selectedDirectory.id,
           directoryName: this.directoryName
         };
-        try {
-          const response = await fetch(
-            this.backendAddress + '/directory/update',
-            {
-              method: 'POST',
-              headers: {
-                'Content-Type': 'application/json;charset=utf-8'
-              },
-              body: JSON.stringify(directory)
-            }
-          );
-          const updatedItem = await response.json();
-          updatedItem.name = updatedItem.directoryName;
-          const mergedItem = { ...this.selectedDirectory, ...updatedItem };
-          const pathToItem = mergedItem.parentId
-            ? [mergedItem.parentId]
-            : [mergedItem.themeId];
-          this.openBranchAndSetActive({
-            branchPath: pathToItem,
-            active: mergedItem
-          });
-          this.dialog = false;
-        } catch (err) {
-          console.warn(err);
-        }
-      } else {
-        try {
-          const directory = {
-            directoryName: this.directoryName,
-            parentId: this.parentDirectory.id,
-            themeId: this.parentDirectory.themeId
+        if (this.selectedDirectory) {
+          directory.id = this.selectedDirectory.id;
+          const response = await repository.update(directory);
+          createdOrUpdatedItem = {
+            ...this.selectedDirectory,
+            ...response.data
           };
-          const response = await fetch(
-            this.backendAddress + '/directory/create',
-            {
-              method: 'POST',
-              headers: {
-                'Content-Type': 'application/json;charset=utf-8'
-              },
-              body: JSON.stringify(directory)
-            }
-          );
-          const createdItem = await response.json();
-          treeUtil.enrichDirectory(createdItem);
-          const pathToItem = createdItem.parentId
-            ? [createdItem.parentId]
-            : [createdItem.themeId];
-          this.openBranchAndSetActive({
-            branchPath: pathToItem,
-            active: createdItem
-          });
-          this.dialog = false;
-        } catch (err) {
-          console.warn(err);
+        } else {
+          directory.parentId = this.parentDirectory.id;
+          directory.themeId = this.parentDirectory.themeId;
+          const response = await repository.create(directory);
+          createdOrUpdatedItem = response.data;
         }
+        treeUtil.enrichDirectory(createdOrUpdatedItem);
+        const pathToItem = createdOrUpdatedItem.parentId
+          ? [createdOrUpdatedItem.parentId]
+          : [createdOrUpdatedItem.themeId];
+        this.openBranchAndSetActive({
+          branchPath: pathToItem,
+          active: createdOrUpdatedItem
+        });
+        this.dialog = false;
+      } catch (err) {
+        console.warn(err);
       }
     }
   }
