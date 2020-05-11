@@ -102,7 +102,8 @@
 </template>
 
 <script>
-import { mapGetters, mapActions } from 'vuex';
+import { mapActions } from 'vuex';
+import { EventBus } from '../../../plugins/event-bus';
 import treeUtil from '@/utils/treeUtil.js';
 import { RepositoryFactory } from '../../../utils/repository/RepositoryFactory';
 
@@ -142,9 +143,6 @@ export default {
     }
   },
   computed: {
-    ...mapGetters('invCardTreeStore', {
-      backendAddress: 'getBackendAddress'
-    }),
     dialogTitle() {
       return this.selectedTheme ? 'Редактировать тему' : 'Создать тему';
     }
@@ -172,7 +170,6 @@ export default {
         if (this.selectedTheme) {
           theme.id = this.selectedTheme.id;
           const response = await repository.update(theme);
-          console.warn(this.selectedTheme);
           createdOrUpdatedItem = { ...this.selectedTheme, ...response.data };
         } else {
           const response = await repository.create(theme);
@@ -186,6 +183,7 @@ export default {
         this.dialog = false;
       } catch (err) {
         console.warn(err);
+        EventBus.$emit('global-error', err);
       }
     }
   }

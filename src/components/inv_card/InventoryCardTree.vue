@@ -42,8 +42,7 @@ export default {
     ...mapGetters('invCardTreeStore', {
       items: 'getItems',
       getterOpen: 'getOpenItems',
-      getterActive: 'getActiveItems',
-      updIdx: 'getUpdIdx'
+      getterActive: 'getActiveItems'
     }),
     open: {
       get() {

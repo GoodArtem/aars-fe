@@ -83,18 +83,12 @@ export default {
     this.loadFormats();
 
     EventBus.$on('global-error', payload => {
-      // console.log('global-error: ' + payload);
+      console.log('global-error: ' + payload);
       this.snackbar = true;
       let message;
 
       if (payload.message) {
         message = payload.message;
-        if (payload.extra && payload.extra.changeRequestId) {
-          let changeRequest = this.getChangeRequestById(
-            payload.extra.changeRequestId
-          );
-          message = `${message} [${changeRequest.name}]`;
-        }
       } else {
         message = payload;
       }

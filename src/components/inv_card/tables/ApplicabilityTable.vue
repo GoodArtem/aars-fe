@@ -10,6 +10,14 @@
           .join('.')
       }}
     </template>
+    <template v-slot:item.actions="{ item }">
+      <v-icon small class="mr-2" @click="editItem(item)">
+        mdi-pencil
+      </v-icon>
+      <v-icon small @click="deleteItem(item)">
+        mdi-delete
+      </v-icon>
+    </template>
     <template v-slot:no-data>
       Нет данных
     </template>
@@ -31,13 +39,18 @@ export default {
     headers: [
       { text: 'Дата', value: 'applicabilityDate' },
       { text: 'Обозначение', value: 'designation' },
-      { text: 'Шифр', value: 'cipher' }
+      { text: 'Шифр', value: 'cipher' },
+      {
+        text: '',
+        sortable: false,
+        value: 'actions',
+        width: '80px'
+      }
     ]
   }),
   computed: {
     ...mapGetters('invCardTreeStore', {
-      selectedItem: 'getSelectedItem',
-      backendAddress: 'getBackendAddress'
+      selectedItem: 'getSelectedItem'
     })
   },
   mounted() {

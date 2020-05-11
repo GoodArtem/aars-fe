@@ -20,18 +20,36 @@
             <v-container>
               <v-row>
                 <v-col cols="12">
-                  <ValidationProvider
-                    v-slot="{ errors }"
-                    name="'Название директории'"
-                    rules="required"
+                  <v-menu
+                    v-model="archiveDateMenu"
+                    :close-on-content-click="false"
+                    :nudge-right="40"
+                    transition="scale-transition"
+                    offset-y
+                    min-width="290px"
                   >
-                    <v-text-field
-                      label="Название директории"
-                      required
-                      v-model="directoryName"
-                      :error-messages="errors"
-                    ></v-text-field>
-                  </ValidationProvider>
+                    <template v-slot:activator="{ on }">
+                      <ValidationProvider
+                        v-slot="{ errors }"
+                        name="'Дата'"
+                        rules="required"
+                      >
+                        <v-text-field
+                          v-model="archiveDate"
+                          label="Дата"
+                          prepend-icon="mdi-calendar"
+                          readonly
+                          v-on="on"
+                          :error-messages="errors"
+                        ></v-text-field>
+                      </ValidationProvider>
+                    </template>
+                    <v-date-picker
+                      v-model="archiveDate"
+                      locale="ru"
+                      @input="archiveDateMenu = false"
+                    ></v-date-picker>
+                  </v-menu>
                 </v-col>
               </v-row>
             </v-container>
@@ -52,16 +70,15 @@
 </template>
 
 <script>
-import { mapActions } from 'vuex';
-import treeUtil from '@/utils/treeUtil.js';
+import { mapGetters, mapActions } from 'vuex';
 import { RepositoryFactory } from '../../../utils/repository/RepositoryFactory';
 
-const repository = RepositoryFactory.get('directory');
+const repository = RepositoryFactory.get('applicability');
 
 export default {
-  name: 'DirectoryCreateEditDialog',
+  name: 'ApplicabilityCreateEditDialog',
   props: {
-    selectedDirectory: {
+    selectedItem: {
       required: false,
       type: Object,
       default: () => undefined
@@ -83,9 +100,7 @@ export default {
   }),
   computed: {
     dialogTitle() {
-      return this.selectedDirectory
-        ? 'Редактировать директорию'
-        : 'Создать директорию';
+      return this.selectedItem ? 'Редактировать' : 'Добавить';
     }
   },
   watch: {
@@ -93,8 +108,8 @@ export default {
       if (this.$refs.observer) {
         this.$refs.observer.reset();
       }
-      this.directoryName = this.selectedDirectory
-        ? this.selectedDirectory.directoryName
+      this.directoryName = this.selectedItem
+        ? this.selectedItem.directoryName
         : null;
     }
   },
@@ -116,11 +131,11 @@ export default {
         const directory = {
           directoryName: this.directoryName
         };
-        if (this.selectedDirectory) {
-          directory.id = this.selectedDirectory.id;
+        if (this.selectedItem) {
+          directory.id = this.selectedItem.id;
           const response = await repository.update(directory);
           createdOrUpdatedItem = {
-            ...this.selectedDirectory,
+            ...this.selectedItem,
             ...response.data
           };
         } else {

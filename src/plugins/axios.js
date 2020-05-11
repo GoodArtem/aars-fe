@@ -35,6 +35,62 @@ let config = {
 
 const _axios = axios.create(config);
 
+_axios.interceptors.response.use(
+  function(response) {
+    // Do something with response data
+    return response;
+  },
+  function(error) {
+    // Do something with response error
+    if (
+      error.request.responseType === 'blob' &&
+      error.response &&
+      error.response.data instanceof Blob &&
+      error.response.data.type &&
+      error.response.data.type.toLowerCase().indexOf('json') != -1
+    ) {
+      return new Promise((resolve, reject) => {
+        let reader = new FileReader();
+        reader.onload = () => {
+          error.response.data = JSON.parse(reader.result);
+          resolve(
+            Promise.reject({
+              message: error.response.data.errors[0].detail
+                ? `${error.response.data.errors[0].error}: ${error.response.data.errors[0].detail}`
+                : `${error.response.data.errors[0].error}: ${error.response.data.errors[0].message}`,
+              status: `${error.response.data.errors[0].status}`,
+              debugDetail: `${error.response.data.errors[0].debugDetail}`
+            })
+          );
+        };
+
+        reader.onerror = () => {
+          reject(error);
+        };
+
+        reader.readAsText(error.response.data);
+      });
+    }
+    if (
+      error.response &&
+      error.response.data &&
+      error.response.data.errors &&
+      error.response.data.errors.length > 0
+    ) {
+      return Promise.reject({
+        message: error.response.data.errors[0].detail
+          ? `${error.response.data.errors[0].error}: ${error.response.data.errors[0].detail}`
+          : `${error.response.data.errors[0].error}: ${error.response.data.errors[0].message}`,
+        status: `${error.response.data.errors[0].status}`,
+        debugDetail: `${error.response.data.errors[0].debugDetail}`
+      });
+    }
+    return Promise.reject({
+      message: error
+    });
+  }
+);
+
 Plugin.install = function(Vue, options) {
   Vue.axios = _axios;
   window.axios = _axios;

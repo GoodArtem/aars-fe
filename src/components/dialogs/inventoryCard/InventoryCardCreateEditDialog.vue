@@ -210,6 +210,7 @@
 
 <script>
 import { mapGetters, mapActions } from 'vuex';
+import { EventBus } from '../../../plugins/event-bus';
 import treeUtil from '@/utils/treeUtil.js';
 import { RepositoryFactory } from '../../../utils/repository/RepositoryFactory';
 
@@ -338,6 +339,7 @@ export default {
         this.dialog = false;
       } catch (err) {
         console.warn(err);
+        EventBus.$emit('global-error', err);
       }
     }
   }
