@@ -1,5 +1,15 @@
 <template>
-  <v-data-table :headers="headers" :items="items" :loading="loading">
+  <v-data-table
+    :headers="headers"
+    :items="items"
+    :loading="loading"
+    :items-per-page="-1"
+    hide-default-footer
+    fixed-header
+    height="100hv"
+    locale="ru"
+    class="elevation-1"
+  >
     <template v-slot:item.applicabilityDate="{ item }">
       {{
         new Date(item.applicabilityDate)
@@ -11,12 +21,23 @@
       }}
     </template>
     <template v-slot:item.actions="{ item }">
-      <v-icon small class="mr-2" @click="editItem(item)">
-        mdi-pencil
-      </v-icon>
-      <v-icon small @click="deleteItem(item)">
-        mdi-delete
-      </v-icon>
+      <ApplicabilityCreateEditDialog
+        v-bind:all-items="items"
+        v-bind:selected-item="item"
+        v-bind:parent-item-id="selectedItem.id"
+        btn-icon="mdi-pencil"
+        dialog-title="Редактировать"
+      ></ApplicabilityCreateEditDialog>
+      <ApplicabilityDeleteDialog
+        v-bind:all-items="items"
+        v-bind:selected-item="item"
+      ></ApplicabilityDeleteDialog>
+    </template>
+    <template v-slot:footer>
+      <ApplicabilityCreateEditDialog
+        v-bind:all-items="items"
+        v-bind:parent-item-id="selectedItem.id"
+      ></ApplicabilityCreateEditDialog>
     </template>
     <template v-slot:no-data>
       Нет данных
@@ -26,6 +47,8 @@
 
 <script>
 import { mapGetters } from 'vuex';
+import ApplicabilityCreateEditDialog from '@/components/dialogs/applicability/ApplicabilityCreateEditDialog.vue';
+import ApplicabilityDeleteDialog from '@/components/dialogs/applicability/ApplicabilityDeleteDialog.vue';
 import { RepositoryFactory } from '../../../utils/repository/RepositoryFactory';
 
 const repository = RepositoryFactory.get('applicability');
@@ -44,7 +67,7 @@ export default {
         text: '',
         sortable: false,
         value: 'actions',
-        width: '80px'
+        width: '105px'
       }
     ]
   }),
@@ -74,6 +97,10 @@ export default {
         console.warn(err);
       }
     }
+  },
+  components: {
+    ApplicabilityCreateEditDialog,
+    ApplicabilityDeleteDialog
   }
 };
 </script>

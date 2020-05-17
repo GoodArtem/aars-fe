@@ -3,6 +3,8 @@
     :headers="headers"
     :items="items"
     :loading="loading"
+    :items-per-page="-1"
+    hide-default-footer
     locale="ru"
     class="elevation-1"
   >

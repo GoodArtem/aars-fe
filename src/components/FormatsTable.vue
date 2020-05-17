@@ -1,5 +1,12 @@
 <template>
-  <v-data-table :headers="headers" :items="formats" class="elevation-1">
+  <v-data-table
+    :headers="headers"
+    :items="formats"
+    :items-per-page="-1"
+    hide-default-footer
+    locale="ru"
+    class="elevation-1"
+  >
   </v-data-table>
 </template>
 

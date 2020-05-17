@@ -48,6 +48,18 @@ export default {
     );
     return promise;
   },
+  getPathToInventoryCard(inventoryCardId) {
+    let promise = Vue.axios.get(
+      `${INVENTORY_CARD}/getPathToInventoryCard?id=${inventoryCardId}`
+    );
+    return promise;
+  },
+  getTreeWithOpenedBranch(inventoryCardId) {
+    let promise = Vue.axios.get(
+      `${INVENTORY_CARD}/getTreeWithOpenedBranch?id=${inventoryCardId}`
+    );
+    return promise;
+  },
   downloadPdf(payload) {
     let promise = Vue.axios({
       url: `${INVENTORY_CARD}/downloadPdf/${payload.id}`,

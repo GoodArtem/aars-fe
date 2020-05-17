@@ -4,7 +4,7 @@
       <v-tooltip bottom>
         <template v-slot:activator="{ on: tooltip }">
           <v-btn icon v-on="{ ...dialog, ...tooltip }">
-            <v-icon>{{ btnIcon }}</v-icon>
+            <v-icon small>{{ btnIcon }}</v-icon>
           </v-btn>
         </template>
         <span>{{ dialogTitle }}</span>
@@ -21,7 +21,7 @@
               <v-row>
                 <v-col cols="12">
                   <v-menu
-                    v-model="archiveDateMenu"
+                    v-model="applicabilityDateMenu"
                     :close-on-content-click="false"
                     :nudge-right="40"
                     transition="scale-transition"
@@ -35,7 +35,7 @@
                         rules="required"
                       >
                         <v-text-field
-                          v-model="archiveDate"
+                          v-model="selectedItemInternal.applicabilityDate"
                           label="Дата"
                           prepend-icon="mdi-calendar"
                           readonly
@@ -45,18 +45,25 @@
                       </ValidationProvider>
                     </template>
                     <v-date-picker
-                      v-model="archiveDate"
+                      v-model="selectedItemInternal.applicabilityDate"
                       locale="ru"
-                      @input="archiveDateMenu = false"
+                      @input="applicabilityDateMenu = false"
                     ></v-date-picker>
                   </v-menu>
+                </v-col>
+              </v-row>
+              <v-row>
+                <v-col cols="12">
+                  <SelectApplicabilityInvCardDialog
+                    v-bind:selected-applicability="selectedItemInternal"
+                  ></SelectApplicabilityInvCardDialog>
                 </v-col>
               </v-row>
             </v-container>
           </v-card-text>
           <v-card-actions>
             <v-spacer></v-spacer>
-            <v-btn color="blue darken-1" text @click="createOrUpdateDirectory"
+            <v-btn color="blue darken-1" text @click="createOrUpdateItem"
               >Сохранить</v-btn
             >
             <v-btn color="blue darken-1" text @click="dialog = false"
@@ -70,52 +77,75 @@
 </template>
 
 <script>
-import { mapGetters, mapActions } from 'vuex';
+import Vue from 'vue';
 import { RepositoryFactory } from '../../../utils/repository/RepositoryFactory';
+import { EventBus } from '../../../plugins/event-bus';
+import SelectApplicabilityInvCardDialog from '@/components/dialogs/applicability/SelectApplicabilityInvCardDialog.vue';
 
 const repository = RepositoryFactory.get('applicability');
 
 export default {
   name: 'ApplicabilityCreateEditDialog',
   props: {
+    allItems: {
+      required: true,
+      type: Array
+    },
     selectedItem: {
       required: false,
       type: Object,
       default: () => undefined
     },
-    parentDirectory: {
+    parentItemId: {
       required: false,
-      type: Object,
+      type: String,
       default: () => undefined
     },
     btnIcon: {
       type: String,
-      default: 'mdi-folder-plus-outline'
+      default: 'mdi-plus'
+    },
+    dialogTitle: {
+      type: String,
+      default: 'Добавить'
     }
   },
   data: () => ({
     dialog: false,
-    directoryName: null,
+    applicabilityDateMenu: false,
+    selectedItemInternal: {
+      id: null,
+      applicabilityDate: null,
+      designation: null,
+      appInventoryCardId: null
+    },
     isValid: null
   }),
-  computed: {
-    dialogTitle() {
-      return this.selectedItem ? 'Редактировать' : 'Добавить';
-    }
-  },
   watch: {
     dialog: function(oldVal, newVal) {
       if (this.$refs.observer) {
         this.$refs.observer.reset();
       }
-      this.directoryName = this.selectedItem
-        ? this.selectedItem.directoryName
-        : null;
+      if (this.selectedItem) {
+        this.selectedItemInternal = {
+          ...this.selectedItem
+        };
+        this.selectedItemInternal.applicabilityDate = this.selectedItem.applicabilityDate.substr(
+          0,
+          10
+        );
+      } else {
+        this.selectedItemInternal = {
+          id: null,
+          applicabilityDate: null,
+          designation: null,
+          appInventoryCardId: null
+        };
+      }
     }
   },
   methods: {
-    ...mapActions('invCardTreeStore', ['openBranchAndSetActive']),
-    async createOrUpdateDirectory() {
+    async createOrUpdateItem() {
       await this.$refs.observer.validate().then(success => {
         this.isValid = success;
         if (!success) {
@@ -128,35 +158,37 @@ export default {
       }
       try {
         let createdOrUpdatedItem = null;
-        const directory = {
-          directoryName: this.directoryName
+        let selectedIdx = null;
+        const applicability = {
+          applicabilityDate: new Date(
+            this.selectedItemInternal.applicabilityDate
+          ).toISOString(),
+          appInventoryCardId: this.selectedItemInternal.appInventoryCardId
         };
         if (this.selectedItem) {
-          directory.id = this.selectedItem.id;
-          const response = await repository.update(directory);
+          applicability.id = this.selectedItem.id;
+          const response = await repository.update(applicability);
           createdOrUpdatedItem = {
             ...this.selectedItem,
             ...response.data
           };
+          selectedIdx = this.allItems.indexOf(this.selectedItem);
         } else {
-          directory.parentId = this.parentDirectory.id;
-          directory.themeId = this.parentDirectory.themeId;
-          const response = await repository.create(directory);
+          applicability.inventoryCardId = this.parentItemId;
+          const response = await repository.create(applicability);
           createdOrUpdatedItem = response.data;
+          selectedIdx = this.allItems.length;
         }
-        treeUtil.enrichDirectory(createdOrUpdatedItem);
-        const pathToItem = createdOrUpdatedItem.parentId
-          ? [createdOrUpdatedItem.parentId]
-          : [createdOrUpdatedItem.themeId];
-        this.openBranchAndSetActive({
-          branchPath: pathToItem,
-          active: createdOrUpdatedItem
-        });
+        Vue.set(this.allItems, selectedIdx, createdOrUpdatedItem);
         this.dialog = false;
       } catch (err) {
         console.warn(err);
+        EventBus.$emit('global-error', err);
       }
     }
+  },
+  components: {
+    SelectApplicabilityInvCardDialog
   }
 };
 </script>
