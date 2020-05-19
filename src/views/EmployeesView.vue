@@ -2,7 +2,10 @@
   <v-container>
     <v-row no-gutters>
       <v-col cols="12">
-        <v-card height="90vh" style="overflow-x:auto; overflow-y:auto">
+        <v-card
+          height="calc(100vh - 96px)"
+          style="overflow-x:auto; overflow-y:auto"
+        >
           <EmployeesTable></EmployeesTable>
         </v-card>
       </v-col>

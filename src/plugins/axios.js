@@ -26,7 +26,7 @@ export const GET_BY_DIRECTORY_ID = '/getByDirectory';
 export const GET_NEXT_SEQUENCE_INVENTORY_NUMBER =
   '/getNextSequenceInventoryNumber';
 
-const backendServiceUrl = 'http://localhost:8081';
+const backendServiceUrl = window.route['backendUrlAddress'];
 
 let config = {
   baseURL: backendServiceUrl,

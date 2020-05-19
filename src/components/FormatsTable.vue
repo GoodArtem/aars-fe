@@ -3,7 +3,10 @@
     :headers="headers"
     :items="formats"
     :items-per-page="-1"
+    dense
     hide-default-footer
+    fixed-header
+    height="calc(100vh - 96px)"
     locale="ru"
     class="elevation-1"
   >

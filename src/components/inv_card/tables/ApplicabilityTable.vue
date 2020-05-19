@@ -4,12 +4,22 @@
     :items="items"
     :loading="loading"
     :items-per-page="-1"
+    dense
     hide-default-footer
     fixed-header
-    height="100hv"
+    height="calc(100vh - 485px)"
     locale="ru"
     class="elevation-1"
   >
+    <template v-slot:top>
+      <v-toolbar>
+        <v-spacer></v-spacer>
+        <ApplicabilityCreateEditDialog
+          v-bind:all-items="items"
+          v-bind:parent-item-id="selectedItem.id"
+        ></ApplicabilityCreateEditDialog>
+      </v-toolbar>
+    </template>
     <template v-slot:item.applicabilityDate="{ item }">
       {{
         new Date(item.applicabilityDate)
@@ -32,12 +42,6 @@
         v-bind:all-items="items"
         v-bind:selected-item="item"
       ></ApplicabilityDeleteDialog>
-    </template>
-    <template v-slot:footer>
-      <ApplicabilityCreateEditDialog
-        v-bind:all-items="items"
-        v-bind:parent-item-id="selectedItem.id"
-      ></ApplicabilityCreateEditDialog>
     </template>
     <template v-slot:no-data>
       Нет данных

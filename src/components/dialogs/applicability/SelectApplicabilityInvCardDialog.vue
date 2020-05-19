@@ -7,7 +7,7 @@
         rules="required"
       >
         <v-text-field
-          v-model="designation"
+          v-model="selectedApplicability.designation"
           label="Обозначение"
           prepend-icon="mdi-card-bulleted-outline"
           readonly
@@ -88,9 +88,6 @@ export default {
       type: Object
     }
   },
-  mounted() {
-    this.designation = this.selectedApplicability.designation;
-  },
   watch: {
     dialog: function(newVal, oldVal) {
       if (newVal) {
@@ -106,6 +103,9 @@ export default {
             Vue.set(this, 'open', open.concat(response.open));
             Vue.set(this, 'active', response.active);
           });
+        } else {
+          Vue.set(this, 'open', []);
+          Vue.set(this, 'active', []);
         }
       }
     }
@@ -121,8 +121,7 @@ export default {
       }
     ],
     open: [],
-    active: [],
-    designation: null
+    active: []
   }),
   methods: {
     async fetchItems(item) {
@@ -168,9 +167,9 @@ export default {
       if (selectedItem) {
         this.selectedApplicability.appInventoryCardId = selectedItem.id;
         this.selectedApplicability.designation = selectedItem.designation;
-        this.designation = selectedItem.designation;
       } else {
-        this.designation = null;
+        this.selectedApplicability.designation = null;
+        this.selectedApplicability.appInventoryCardId = null;
       }
       this.dialog = false;
     }

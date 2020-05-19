@@ -3,8 +3,15 @@
     <template v-slot:activator="{ on: dialog }">
       <v-tooltip bottom>
         <template v-slot:activator="{ on: tooltip }">
-          <v-btn icon v-on="{ ...dialog, ...tooltip }">
-            <v-icon small>{{ btnIcon }}</v-icon>
+          <v-btn
+            :small="!isCreatingDialog"
+            :icon="!isCreatingDialog"
+            :dark="isCreatingDialog"
+            :fab="isCreatingDialog"
+            :color="btnColor"
+            v-on="{ ...dialog, ...tooltip }"
+          >
+            <v-icon :small="!isCreatingDialog">{{ btnIcon }}</v-icon>
           </v-btn>
         </template>
         <span>{{ dialogTitle }}</span>
@@ -121,6 +128,14 @@ export default {
     },
     isValid: null
   }),
+  computed: {
+    isCreatingDialog() {
+      return this.btnIcon === 'mdi-plus';
+    },
+    btnColor() {
+      return this.isCreatingDialog ? 'blue darken-1' : undefined;
+    }
+  },
   watch: {
     dialog: function(oldVal, newVal) {
       if (this.$refs.observer) {

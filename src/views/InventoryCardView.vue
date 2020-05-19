@@ -2,12 +2,15 @@
   <v-container>
     <v-row dense>
       <v-col cols="4">
-        <v-card height="90vh" style="overflow-x:auto; overflow-y:auto">
+        <v-card
+          height="calc(100vh - 96px)"
+          style="overflow-x:auto; overflow-y:auto"
+        >
           <InventoryCardTree></InventoryCardTree>
         </v-card>
       </v-col>
       <v-col cols="8">
-        <v-card height="90vh">
+        <v-card height="calc(100vh - 96px)">
           <v-toolbar color="primary" dark>
             <v-toolbar-title>{{ titleSelectedItem }}</v-toolbar-title>
             <v-spacer></v-spacer>

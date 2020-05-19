@@ -3,7 +3,7 @@
     <template v-slot:activator="{ on: dialog }">
       <v-tooltip bottom>
         <template v-slot:activator="{ on: tooltip }">
-          <v-btn icon v-on="{ ...dialog, ...tooltip }">
+          <v-btn small icon v-on="{ ...dialog, ...tooltip }">
             <v-icon small>{{ btnIcon }}</v-icon>
           </v-btn>
         </template>
