@@ -28,7 +28,7 @@
               <v-row>
                 <v-col cols="12">
                   <v-menu
-                    v-model="applicabilityDateMenu"
+                    v-model="copyDateMenu"
                     :close-on-content-click="false"
                     :nudge-right="40"
                     transition="scale-transition"
@@ -42,7 +42,7 @@
                         rules="required"
                       >
                         <v-text-field
-                          v-model="selectedItemInternal.applicabilityDate"
+                          v-model="selectedItemInternal.copyDate"
                           label="Дата"
                           prepend-icon="mdi-calendar"
                           readonly
@@ -52,18 +52,57 @@
                       </ValidationProvider>
                     </template>
                     <v-date-picker
-                      v-model="selectedItemInternal.applicabilityDate"
+                      v-model="selectedItemInternal.copyDate"
                       locale="ru"
-                      @input="applicabilityDateMenu = false"
+                      @input="copyDateMenu = false"
                     ></v-date-picker>
                   </v-menu>
                 </v-col>
               </v-row>
               <v-row>
                 <v-col cols="12">
-                  <SelectApplicabilityInvCardDialog
-                    v-bind:selected-applicability="selectedItemInternal"
-                  ></SelectApplicabilityInvCardDialog>
+                  <ValidationProvider
+                    v-slot="{ errors }"
+                    name="'Обозначение'"
+                    rules="required"
+                  >
+                    <v-select
+                      v-model="selectedItemInternal.employeeId"
+                      :items="allEmployees"
+                      item-text="employeeName"
+                      item-value="id"
+                      label="Обозначение"
+                      required
+                      :error-messages="errors"
+                    ></v-select>
+                  </ValidationProvider>
+                </v-col>
+              </v-row>
+              <v-row>
+                <v-col cols="12">
+                  <ValidationProvider
+                    v-slot="{ errors }"
+                    name="'Поступило'"
+                    rules="required"
+                  >
+                    <v-text-field
+                      label="Поступило"
+                      required
+                      v-model="selectedItemInternal.receivedCopy"
+                      :error-messages="errors"
+                    ></v-text-field>
+                  </ValidationProvider>
+                </v-col>
+              </v-row>
+              <v-row>
+                <v-col cols="12">
+                  <ValidationProvider v-slot="{ errors }" name="'Списано'">
+                    <v-text-field
+                      label="Списано"
+                      v-model="selectedItemInternal.annulledCopy"
+                      :error-messages="errors"
+                    ></v-text-field>
+                  </ValidationProvider>
                 </v-col>
               </v-row>
             </v-container>
@@ -85,14 +124,14 @@
 
 <script>
 import Vue from 'vue';
+import { mapGetters } from 'vuex';
 import { RepositoryFactory } from '../../../utils/repository/RepositoryFactory';
 import { EventBus } from '../../../plugins/event-bus';
-import SelectApplicabilityInvCardDialog from '@/components/dialogs/applicability/SelectApplicabilityInvCardDialog.vue';
 
-const repository = RepositoryFactory.get('applicability');
+const repository = RepositoryFactory.get('copiesInfo');
 
 export default {
-  name: 'ApplicabilityCreateEditDialog',
+  name: 'CopiesInfoCreateEditDialog',
   props: {
     allItems: {
       required: true,
@@ -114,17 +153,19 @@ export default {
     },
     dialogTitle: {
       type: String,
-      default: 'Добавить'
+      default: 'Выдать копию'
     }
   },
   data: () => ({
     dialog: false,
-    applicabilityDateMenu: false,
+    copyDateMenu: false,
     selectedItemInternal: {
       id: null,
-      applicabilityDate: null,
+      copyDate: null,
+      employeeId: null,
       designation: null,
-      appInventoryCardId: null
+      receivedCopy: null,
+      annulledCopy: null
     },
     isValid: null
   }),
@@ -134,7 +175,10 @@ export default {
     },
     btnColor() {
       return this.isCreatingDialog ? 'blue darken-1' : undefined;
-    }
+    },
+    ...mapGetters('employeeStore', {
+      allEmployees: 'getEmployees'
+    })
   },
   watch: {
     dialog: function(oldVal, newVal) {
@@ -145,16 +189,18 @@ export default {
         this.selectedItemInternal = {
           ...this.selectedItem
         };
-        this.selectedItemInternal.applicabilityDate = this.selectedItem.applicabilityDate.substr(
+        this.selectedItemInternal.copyDate = this.selectedItem.copyDate.substr(
           0,
           10
         );
       } else {
         this.selectedItemInternal = {
           id: null,
-          applicabilityDate: null,
+          copyDate: null,
+          employeeId: null,
           designation: null,
-          appInventoryCardId: null
+          receivedCopy: null,
+          annulledCopy: null
         };
       }
     }
@@ -174,23 +220,24 @@ export default {
       try {
         let createdOrUpdatedItem = null;
         let selectedIdx = null;
-        const applicability = {
-          applicabilityDate: new Date(
-            this.selectedItemInternal.applicabilityDate
-          ).toISOString(),
-          appInventoryCardId: this.selectedItemInternal.appInventoryCardId
+        const copiesInfo = {
+          inventoryCardId: this.parentItemId,
+          copyDate: new Date(this.selectedItemInternal.copyDate).toISOString(),
+          employeeId: this.selectedItemInternal.employeeId,
+          designation: this.selectedItemInternal.designation,
+          receivedCopy: this.selectedItemInternal.receivedCopy,
+          annulledCopy: this.selectedItemInternal.annulledCopy
         };
         if (this.selectedItem) {
-          applicability.id = this.selectedItem.id;
-          const response = await repository.update(applicability);
+          copiesInfo.id = this.selectedItem.id;
+          const response = await repository.update(copiesInfo);
           createdOrUpdatedItem = {
             ...this.selectedItem,
             ...response.data
           };
           selectedIdx = this.allItems.indexOf(this.selectedItem);
         } else {
-          applicability.inventoryCardId = this.parentItemId;
-          const response = await repository.create(applicability);
+          const response = await repository.create(copiesInfo);
           createdOrUpdatedItem = response.data;
           selectedIdx = this.allItems.length;
         }
@@ -200,9 +247,6 @@ export default {
         EventBus.$emit('global-error', err);
       }
     }
-  },
-  components: {
-    SelectApplicabilityInvCardDialog
   }
 };
 </script>
