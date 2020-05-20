@@ -44,8 +44,7 @@ export default {
   }),
   computed: {
     ...mapGetters('invCardTreeStore', {
-      selectedItem: 'getSelectedItem',
-      backendAddress: 'getBackendAddress'
+      selectedItem: 'getSelectedItem'
     })
   },
   mounted() {

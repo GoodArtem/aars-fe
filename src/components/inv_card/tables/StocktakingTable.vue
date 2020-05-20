@@ -4,10 +4,23 @@
     :items="items"
     :loading="loading"
     :items-per-page="-1"
+    dense
     hide-default-footer
+    fixed-header
+    height="calc(100vh - 489px)"
     locale="ru"
     class="elevation-1"
   >
+    <template v-slot:top>
+      <v-toolbar>
+        <v-spacer></v-spacer>
+        <StocktakingCreateEditDialog
+          v-bind:all-items="items"
+          v-bind:parent-item-id="selectedItem.id"
+          @onUpdateData="fetchData"
+        ></StocktakingCreateEditDialog>
+      </v-toolbar>
+    </template>
     <template v-slot:item.dateChanging="{ item }">
       {{
         new Date(item.dateChanging)
@@ -18,6 +31,21 @@
           .join('.')
       }}
     </template>
+    <template v-slot:item.actions="{ item }">
+      <StocktakingCreateEditDialog
+        v-bind:all-items="items"
+        v-bind:selected-item="item"
+        v-bind:parent-item-id="selectedItem.id"
+        @onUpdateData="fetchData"
+        btn-icon="mdi-pencil"
+        dialog-title="Редактировать"
+      ></StocktakingCreateEditDialog>
+      <StocktakingDeleteDialog
+        v-bind:all-items="items"
+        v-bind:selected-item="item"
+        @onUpdateData="fetchData"
+      ></StocktakingDeleteDialog>
+    </template>
     <template v-slot:no-data>
       Нет данных
     </template>
@@ -27,6 +55,8 @@
 <script>
 import { mapGetters } from 'vuex';
 import { RepositoryFactory } from '../../../utils/repository/RepositoryFactory';
+import StocktakingCreateEditDialog from '@/components/dialogs/stocktaking/StocktakingCreateEditDialog.vue';
+import StocktakingDeleteDialog from '@/components/dialogs/stocktaking/StocktakingDeleteDialog.vue';
 
 const repository = RepositoryFactory.get('stocktaking');
 
@@ -39,13 +69,18 @@ export default {
       { text: 'Номер изменения', value: 'changing' },
       { text: 'Номер документа', value: 'docNumber' },
       { text: 'Дата внесения', value: 'dateChanging' },
-      { text: 'Листы', value: 'changedSheets' }
+      { text: 'Листы', value: 'changedSheets' },
+      {
+        text: '',
+        sortable: false,
+        value: 'actions',
+        width: '90px'
+      }
     ]
   }),
   computed: {
     ...mapGetters('invCardTreeStore', {
-      selectedItem: 'getSelectedItem',
-      backendAddress: 'getBackendAddress'
+      selectedItem: 'getSelectedItem'
     })
   },
   mounted() {
@@ -69,6 +104,10 @@ export default {
         console.warn(err);
       }
     }
+  },
+  components: {
+    StocktakingCreateEditDialog,
+    StocktakingDeleteDialog
   }
 };
 </script>

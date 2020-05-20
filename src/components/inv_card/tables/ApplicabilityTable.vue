@@ -7,7 +7,7 @@
     dense
     hide-default-footer
     fixed-header
-    height="calc(100vh - 485px)"
+    height="calc(100vh - 489px)"
     locale="ru"
     class="elevation-1"
   >
@@ -51,9 +51,9 @@
 
 <script>
 import { mapGetters } from 'vuex';
+import { RepositoryFactory } from '../../../utils/repository/RepositoryFactory';
 import ApplicabilityCreateEditDialog from '@/components/dialogs/applicability/ApplicabilityCreateEditDialog.vue';
 import ApplicabilityDeleteDialog from '@/components/dialogs/applicability/ApplicabilityDeleteDialog.vue';
-import { RepositoryFactory } from '../../../utils/repository/RepositoryFactory';
 
 const repository = RepositoryFactory.get('applicability');
 
@@ -71,7 +71,7 @@ export default {
         text: '',
         sortable: false,
         value: 'actions',
-        width: '105px'
+        width: '90px'
       }
     ]
   }),

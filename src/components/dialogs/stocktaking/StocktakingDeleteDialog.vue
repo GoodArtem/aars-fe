@@ -19,9 +19,10 @@
           <v-row>
             <v-col cols="12">
               <v-card-text>
-                Вы действительно хотите удалить применяемость для инвентарной
-                карточки "{{ selectedItem.designation }}
-                {{ selectedItem.cipher }}" от "{{ applicabilityDate }}"?
+                Вы действительно хотите удалить изменение внесенной документом
+                "{{ selectedItem.docNumber }} (измененные листы:{{
+                  selectedItem.changedSheets
+                }})" от "{{ dateChanging }}"?
               </v-card-text>
             </v-col>
           </v-row>
@@ -45,10 +46,10 @@ import Vue from 'vue';
 import { RepositoryFactory } from '../../../utils/repository/RepositoryFactory';
 import { EventBus } from '../../../plugins/event-bus';
 
-const repository = RepositoryFactory.get('applicability');
+const repository = RepositoryFactory.get('stocktaking');
 
 export default {
-  name: 'ApplicabilityDeleteDialog',
+  name: 'StocktakingDeleteDialog',
   props: {
     allItems: {
       required: true,
@@ -68,11 +69,11 @@ export default {
   }),
   computed: {
     dialogTitle() {
-      return 'Удалить применяемость';
+      return 'Удалить изменение';
     },
-    applicabilityDate() {
-      if (this.selectedItem && this.selectedItem.applicabilityDate) {
-        return new Date(this.selectedItem.applicabilityDate)
+    dateChanging() {
+      if (this.selectedItem && this.selectedItem.dateChanging) {
+        return new Date(this.selectedItem.dateChanging)
           .toISOString()
           .substr(0, 10)
           .split('-')
@@ -88,7 +89,7 @@ export default {
         try {
           await repository.delete(this.selectedItem);
           const selectedIdx = this.allItems.indexOf(this.selectedItem);
-          Vue.delete(this.allItems, selectedIdx);
+          this.$emit('onUpdateData');
           this.dialog = false;
         } catch (err) {
           EventBus.$emit('global-error', err);

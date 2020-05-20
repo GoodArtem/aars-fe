@@ -1,5 +1,5 @@
 <template>
-  <v-container>
+  <v-container fluid class="pa-2 ma-0">
     <v-row dense>
       <v-col cols="4">
         <v-card
