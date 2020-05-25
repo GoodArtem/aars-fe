@@ -15,6 +15,10 @@ export default {
     let promise = Vue.axios.post(`${STOCKTAKING}${CREATE}`, payload);
     return promise;
   },
+  bulkCreate(payload) {
+    let promise = Vue.axios.post(`${STOCKTAKING}/bulkCreate`, payload);
+    return promise;
+  },
   update(payload) {
     let promise = Vue.axios.post(`${STOCKTAKING}${UPDATE}`, payload);
     return promise;

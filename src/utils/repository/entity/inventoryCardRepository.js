@@ -60,6 +60,18 @@ export default {
     );
     return promise;
   },
+  getAllByThemeIdWithLastChange(payload) {
+    let promise = Vue.axios.get(
+      `${INVENTORY_CARD}/getAllByThemeIdWithLastChange/${payload.themeId}?cardType=${payload.directoryType}`
+    );
+    return promise;
+  },
+  getAllByDirectoryIdWithLastChange(directoryId) {
+    let promise = Vue.axios.get(
+      `${INVENTORY_CARD}/getAllByDirectoryIdWithLastChange/${directoryId}`
+    );
+    return promise;
+  },
   downloadPdf(payload) {
     let promise = Vue.axios({
       url: `${INVENTORY_CARD}/downloadPdf/${payload.id}`,

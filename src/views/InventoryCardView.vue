@@ -31,6 +31,7 @@
             </InventoryCardToolbarItems>
           </v-toolbar>
           <SubscriberTable v-if="isTheme"></SubscriberTable>
+          <MakeChangesTable v-if="isDirectory"></MakeChangesTable>
           <InventoryCardGeneral v-if="isInventoryCard"></InventoryCardGeneral>
         </v-card>
       </v-col>
@@ -41,6 +42,7 @@
 <script>
 import { mapGetters } from 'vuex';
 import SubscriberTable from '@/components/treeItemCards/tables/SubscriberTable.vue';
+import MakeChangesTable from '@/components/treeItemCards/tables/MakeChangesTable.vue';
 import InventoryCardTree from '@/components/treeItemCards/InventoryCardTree.vue';
 import InventoryCardGeneral from '@/components/treeItemCards/InventoryCardGeneral.vue';
 import RootToolbarItems from '@/components/toolbarItems/RootToolbarItems.vue';
@@ -76,6 +78,7 @@ export default {
   },
   components: {
     SubscriberTable,
+    MakeChangesTable,
     InventoryCardTree,
     InventoryCardGeneral,
     RootToolbarItems,
