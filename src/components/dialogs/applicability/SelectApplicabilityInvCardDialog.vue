@@ -147,7 +147,6 @@ export default {
           );
         }
       } catch (err) {
-        console.warn(err);
         EventBus.$emit('global-error', err);
       }
     },
@@ -158,7 +157,6 @@ export default {
         );
         return response.data;
       } catch (err) {
-        console.warn(err);
         EventBus.$emit('global-error', err);
       }
     },

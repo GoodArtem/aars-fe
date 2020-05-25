@@ -7,7 +7,7 @@
     dense
     hide-default-footer
     fixed-header
-    height="calc(100vh - 489px)"
+    height="calc(100vh - 223px)"
     locale="ru"
     class="elevation-1"
   >
@@ -68,6 +68,7 @@
 <script>
 import { mapGetters } from 'vuex';
 import { RepositoryFactory } from '../../../utils/repository/RepositoryFactory';
+import { EventBus } from '@/plugins/event-bus';
 import MakeChangesDialog from '@/components/dialogs/directory/MakeChangesDialog.vue';
 
 const repository = RepositoryFactory.get('inventoryCard');
@@ -119,7 +120,7 @@ export default {
         this.items = [...response.data];
         this.loading = false;
       } catch (err) {
-        console.warn(err);
+        EventBus.$emit('global-error', err);
       }
     }
   },

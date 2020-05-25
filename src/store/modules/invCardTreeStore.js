@@ -1,6 +1,7 @@
 import Vue from 'vue';
 import { RepositoryFactory } from '../../utils/repository/RepositoryFactory';
 import treeUtil from '../../utils/treeUtil';
+import { EventBus } from '../../plugins/event-bus';
 
 const state = {
   items: [
@@ -73,7 +74,7 @@ const actions = {
         );
         commit('setChildItems', { item: item, childItems: childItems });
       } catch (err) {
-        console.warn(err);
+        EventBus.$emit('global-error', err);
       }
     } else if (item.isTheme) {
       try {
@@ -85,7 +86,7 @@ const actions = {
         );
         commit('setChildItems', { item: item, childItems: childItems });
       } catch (err) {
-        console.warn(err);
+        EventBus.$emit('global-error', err);
       }
     } else if (item.isDirectory) {
       try {
@@ -106,8 +107,26 @@ const actions = {
         const childItems = childDirectories.concat(childCards);
         commit('setChildItems', { item: item, childItems: childItems });
       } catch (err) {
-        console.warn(err);
+        EventBus.$emit('global-error', err);
       }
+    }
+    commit('setItemsLoading', false);
+  },
+  async openCard({ commit, state }, item) {
+    commit('setItemsLoading', true);
+    try {
+      const response = await RepositoryFactory.get(
+        'inventoryCard'
+      ).getTreeWithOpenedBranch(item.id);
+      commit('setChildItems', {
+        item: state.items[0],
+        childItems: response.data.tree
+      });
+      const open = [{ id: '0' }];
+      commit('setOpenItems', open.concat(response.data.open));
+      commit('setActiveItems', response.data.active);
+    } catch (err) {
+      EventBus.$emit('global-error', err);
     }
     commit('setItemsLoading', false);
   }

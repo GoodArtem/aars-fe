@@ -338,7 +338,6 @@ export default {
         });
         this.dialog = false;
       } catch (err) {
-        console.warn(err);
         EventBus.$emit('global-error', err);
       }
     }

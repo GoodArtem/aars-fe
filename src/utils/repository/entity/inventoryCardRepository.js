@@ -72,6 +72,12 @@ export default {
     );
     return promise;
   },
+  getInventoryCardBySearchString(searchString) {
+    let promise = Vue.axios.get(
+      `${INVENTORY_CARD}/getInventoryCardBySearchString?searchString=${searchString}`
+    );
+    return promise;
+  },
   downloadPdf(payload) {
     let promise = Vue.axios({
       url: `${INVENTORY_CARD}/downloadPdf/${payload.id}`,

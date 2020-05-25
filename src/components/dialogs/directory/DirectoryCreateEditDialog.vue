@@ -55,6 +55,7 @@
 import { mapActions } from 'vuex';
 import treeUtil from '@/utils/treeUtil.js';
 import { RepositoryFactory } from '../../../utils/repository/RepositoryFactory';
+import { EventBus } from '@/plugins/event-bus';
 
 const repository = RepositoryFactory.get('directory');
 
@@ -139,7 +140,7 @@ export default {
         });
         this.dialog = false;
       } catch (err) {
-        console.warn(err);
+        EventBus.$emit('global-error', err);
       }
     }
   }

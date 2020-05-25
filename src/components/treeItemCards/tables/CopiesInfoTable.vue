@@ -52,6 +52,7 @@
 <script>
 import { mapGetters } from 'vuex';
 import { RepositoryFactory } from '../../../utils/repository/RepositoryFactory';
+import { EventBus } from '@/plugins/event-bus';
 import CopiesInfoCreateEditDialog from '@/components/dialogs/copiesInfo/CopiesInfoCreateEditDialog.vue';
 import CopiesInfoDeleteDialog from '@/components/dialogs/copiesInfo/CopiesInfoDeleteDialog.vue';
 
@@ -98,7 +99,7 @@ export default {
         this.items = [...response.data];
         this.loading = false;
       } catch (err) {
-        console.warn(err);
+        EventBus.$emit('global-error', err);
       }
     }
   },

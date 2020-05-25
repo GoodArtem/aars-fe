@@ -1,5 +1,6 @@
 import Vue from 'vue';
 import { RepositoryFactory } from '../../utils/repository/RepositoryFactory';
+import { EventBus } from '../../plugins/event-bus';
 
 const state = {
   employees: []
@@ -17,7 +18,7 @@ const actions = {
       const response = await RepositoryFactory.get('employee').getAll();
       commit('setItems', response.data);
     } catch (err) {
-      console.warn(err);
+      EventBus.$emit('global-error', err);
     }
   },
   async onCreateItem({ commit, state }, item) {
@@ -25,7 +26,7 @@ const actions = {
       const response = await RepositoryFactory.get('employee').create(item);
       commit('createItem', response.data);
     } catch (err) {
-      console.warn(err);
+      EventBus.$emit('global-error', err);
     }
   },
   async onUpdateItem({ commit, state }, payload) {
@@ -36,7 +37,7 @@ const actions = {
       payload.item = response.data;
       commit('updateItem', payload);
     } catch (err) {
-      console.warn(err);
+      EventBus.$emit('global-error', err);
     }
   },
   async onDeleteItem({ commit, state }, idx) {
@@ -46,7 +47,7 @@ const actions = {
       );
       commit('deleteItem', idx);
     } catch (err) {
-      console.warn(err);
+      EventBus.$emit('global-error', err);
     }
   }
 };
