@@ -43,6 +43,8 @@
         :return-value.sync="props.item.changedSheets"
         large
         persistent
+        save-text="Сохранить"
+        cancel-text="Отмена"
       >
         <div>{{ props.item.changedSheets }}</div>
         <template v-slot:input>

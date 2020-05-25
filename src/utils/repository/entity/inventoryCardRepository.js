@@ -73,8 +73,9 @@ export default {
     return promise;
   },
   getInventoryCardBySearchString(searchString) {
-    let promise = Vue.axios.get(
-      `${INVENTORY_CARD}/getInventoryCardBySearchString?searchString=${searchString}`
+    let promise = Vue.axios.post(
+      `${INVENTORY_CARD}/getInventoryCardBySearchString`,
+      { searchString }
     );
     return promise;
   },

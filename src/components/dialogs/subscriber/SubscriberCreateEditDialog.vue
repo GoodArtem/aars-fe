@@ -165,7 +165,7 @@ export default {
     },
     dialogTitle: {
       type: String,
-      default: 'Внести изменение'
+      default: 'Добавить абонента'
     }
   },
   data: () => ({

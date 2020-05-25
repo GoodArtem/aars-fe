@@ -83,7 +83,6 @@ export default {
     this.loadFormats();
 
     EventBus.$on('global-error', payload => {
-      console.log('global-error: ' + payload);
       this.snackbar = true;
       let message;
 

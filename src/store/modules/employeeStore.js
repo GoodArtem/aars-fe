@@ -43,7 +43,7 @@ const actions = {
   async onDeleteItem({ commit, state }, idx) {
     try {
       const response = await RepositoryFactory.get('employee').delete(
-        state.formats[idx]
+        state.employees[idx]
       );
       commit('deleteItem', idx);
     } catch (err) {

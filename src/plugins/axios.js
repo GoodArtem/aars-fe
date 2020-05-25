@@ -26,7 +26,10 @@ export const GET_BY_DIRECTORY_ID = '/getByDirectory';
 export const GET_NEXT_SEQUENCE_INVENTORY_NUMBER =
   '/getNextSequenceInventoryNumber';
 
-const backendServiceUrl = window.route['backendUrlAddress'];
+const backendServiceUrl = window.origin.replace(
+  new RegExp(':[0-9]{1,5}$'),
+  ':18080'
+);
 
 let config = {
   baseURL: backendServiceUrl,
